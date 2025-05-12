@@ -15,7 +15,7 @@ namespace Admin.eShop.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody] UserLoginRequest request)
         {
-            var response = await _adminAuthService.UserLoginAsync(request);
+            var response = await _adminAuthService.AdminLoginAsync(request);
             return HandleResponse(response);
         }
     }

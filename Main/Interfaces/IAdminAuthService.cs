@@ -11,6 +11,6 @@ namespace Main.Interfaces
 {
     public interface IAdminAuthService
     {
-        Task<ApiResponse<LoginDTO>> UserLoginAsync(UserLoginRequest request);
+        Task<ApiResponse<LoginDTO>> AdminLoginAsync(UserLoginRequest request);
     }
 }

@@ -1,6 +1,8 @@
-﻿using Domain.Interfaces;
+﻿using Domain.Enums;
+using Domain.Interfaces;
 using Domain.Models;
 using Infrastructure.Data.Context;
+using Main.Constants;
 using Main.DTOs.Auth;
 using Main.Enums;
 using Main.Helpers;
@@ -22,18 +24,18 @@ namespace Main.Services
     {
         private readonly IGenericRepository<User> _userRepository = _uow.GetGenericRepository<User>();
 
-        public async Task<ApiResponse<LoginDTO>> UserLoginAsync(UserLoginRequest request)
+        public async Task<ApiResponse<LoginDTO>> AdminLoginAsync(UserLoginRequest request)
         {
             try
             {
                 var response = await _userRepository.GetAsync(x => x.Username.ToLower() == request.Username.ToLower());
                 var user = response?.FirstOrDefault();
 
-                if (user is null)
+                if (user is null && user.Role.ToString() != Role.Admin.ToString())
                 {
                     return new ApiResponse<LoginDTO>
                     {
-                        Message = "user not found",
+                        Message = AuthConstants.USER_NOT_FOUND,
                         Success = false,
                         NotificationType = NotificationType.BadRequest
                     };
@@ -45,7 +47,7 @@ namespace Main.Services
                 {
                     return new ApiResponse<LoginDTO>
                     {
-                        Message = "invalid pass",
+                        Message = AuthConstants.INVALID_PASSWORD,
                         Success = false,
                         NotificationType = NotificationType.BadRequest
                     };
@@ -57,7 +59,7 @@ namespace Main.Services
                 {
                     Success = true,
                     NotificationType = NotificationType.Success,
-                    Message = "Success",
+                    Message = AuthConstants.ADMIN_LOGIN_SUCCESS,
                     Data = new LoginDTO
                     {
                         Id = user.Id,
@@ -70,14 +72,14 @@ namespace Main.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while loggin user at {Timestamp}. Username: {Username}",
+                _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp}. Username: {Username}", nameof(AdminLoginAsync),
                     DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), request.Username);
 
                 return new ApiResponse<LoginDTO>
                 {
                     Success = false,
                     NotificationType = NotificationType.ServerError,
-                    Message = "1"
+                    Message = AuthConstants.ERROR_LOGIN
                 };
             }
         }
