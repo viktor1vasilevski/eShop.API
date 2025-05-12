@@ -16,20 +16,23 @@ namespace Infrastructure.Data.Context
         }
 
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Subcategory> Subcategories { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<Category>()
-            //    .HasMany(x => x.Subcategories)
-            //    .WithOne(x => x.Category)
-            //    .HasForeignKey(x => x.CategoryId)
-            //    .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Category>()
+                .HasMany(x => x.Subcategories)
+                .WithOne(x => x.Category)
+                .HasForeignKey(x => x.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            //modelBuilder.Entity<Product>()
-            //    .HasOne(x => x.Subcategory)
-            //    .WithMany(x => x.Products)
-            //    .HasForeignKey(u => u.SubcategoryId)
-            //    .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Product>()
+                .HasOne(x => x.Subcategory)
+                .WithMany(x => x.Products)
+                .HasForeignKey(u => u.SubcategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             //modelBuilder.Entity<Order>()
             //    .HasOne(x => x.User)
