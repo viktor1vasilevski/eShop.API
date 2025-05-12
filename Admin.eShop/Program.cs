@@ -1,5 +1,11 @@
+using Domain.Enums;
+using Domain.Interfaces;
+using Domain.Models;
 using Infrastructure.Data.Context;
+using Infrastructure.Data.Repositories;
+using Main.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Infrastructure.IoC;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +20,83 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped(typeof(IUnitOfWork<>), typeof(SqlUnitOfWork<>));
+builder.Services.AddIoCService();
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var serviceProvider = scope.ServiceProvider;
+
+    try
+    {
+        var dbContext = serviceProvider.GetRequiredService<AppDbContext>();
+
+        // Apply any pending migrations
+        dbContext.Database.Migrate();
+
+        var uncatgorizedCategory = dbContext.Categories.Any(x => x.Name == "UNCATEGORIZED");
+        if (!uncatgorizedCategory)
+        {
+            var category = new Category
+            {
+                Name = "UNCATEGORIZED"
+            };
+
+            dbContext.Categories.Add(category);
+            dbContext.SaveChanges();
+        }
+
+
+        var uncatgorizedSubcategory = dbContext.Subcategories.Any(x => x.Name == "UNCATEGORIZED");
+        if (!uncatgorizedSubcategory)
+        {
+            var category = dbContext.Categories.Where(x => x.Name == "UNCATEGORIZED").First();
+
+            var subcategory = new Subcategory
+            {
+                Name = "UNCATEGORIZED",
+                CategoryId = category.Id,
+            };
+
+            dbContext.Subcategories.Add(subcategory);
+            dbContext.SaveChanges();
+        }
+
+
+
+        var adminExist = dbContext.Users.Any(x => x.Role == Role.Admin);
+
+        if (!adminExist)
+        {
+
+            var saltKey = PasswordHasher.GenerateSalt();
+            var adminUser = new User
+            {
+                FirstName = "Admin",
+                LastName = "Admin",
+                Email = "admin@example.com",
+                Username = "admin",
+                Role = Role.Admin,
+                PasswordHash = PasswordHasher.HashPassword("Admin@123", saltKey),
+                SaltKey = Convert.ToBase64String(saltKey),
+                CreatedBy = "Admin",
+                Created = DateTime.Now,
+                LastModifiedBy = null,
+                LastModified = null
+            };
+
+            dbContext.Users.Add(adminUser);
+            dbContext.SaveChanges();
+
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error during admin user setup: {ex.Message}");
+    }
+}
 
 app.MapDefaultEndpoints();
 

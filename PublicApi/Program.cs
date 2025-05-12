@@ -1,5 +1,7 @@
+using Domain.Interfaces;
 using FastEndpoints.Swagger;
 using Infrastructure.Data.Context;
+using Infrastructure.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 using PublicApi.Extension;
 using System;
@@ -16,6 +18,8 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped(typeof(IUnitOfWork<>), typeof(SqlUnitOfWork<>));
 
 
 builder.Services.AddSwagger();

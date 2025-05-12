@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Query;
 
 namespace Domain.Interfaces
 {
-    public interface IRepository<TEntity> where TEntity : class
+    public interface IGenericRepository<TEntity> where TEntity : class
     {
         TEntity Delete(object id);
         void Delete(TEntity entity);
