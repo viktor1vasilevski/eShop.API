@@ -1,5 +1,8 @@
 using FastEndpoints.Swagger;
+using Infrastructure.Data.Context;
+using Microsoft.EntityFrameworkCore;
 using PublicApi.Extension;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +12,10 @@ builder.AddServiceDefaults();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-//builder.Services.AddOpenApi();
+builder.Services.AddOpenApi();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
 builder.Services.AddSwagger();
