@@ -1,7 +1,7 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddProject<Projects.Admin_eShop>("admin-eshop");
+builder.AddProject<Projects.eShop_Admin>("eshop-admin");
 
-builder.AddProject<Projects.PublicApi>("publicapi");
+builder.AddProject<Projects.eShop_PublicApi>("eshop-publicapi");
 
 builder.Build().Run();

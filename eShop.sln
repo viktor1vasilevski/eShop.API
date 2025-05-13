@@ -5,21 +5,21 @@ VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.eShop", "Admin.eShop\Admin.eShop.csproj", "{C3BAE819-E167-4DE0-AD14-725345DACC51}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eShop.Admin", "Admin.eShop\eShop.Admin.csproj", "{C3BAE819-E167-4DE0-AD14-725345DACC51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PublicApi", "PublicApi\PublicApi.csproj", "{52F924BC-1A40-469F-80E4-07EF8987B5FF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eShop.PublicApi", "PublicApi\eShop.PublicApi.csproj", "{52F924BC-1A40-469F-80E4-07EF8987B5FF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eShop.AppHost", "eShop.AppHost\eShop.AppHost.csproj", "{8E683918-71B6-4F7C-B040-FAB8CE28BBD2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eShop.ServiceDefaults", "eShop.ServiceDefaults\eShop.ServiceDefaults.csproj", "{3941E297-4449-5207-EC32-3679FF14F902}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{F411ADBE-65E5-4D39-AE4A-4485D8BC9B3E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eShop.Domain", "Domain\eShop.Domain.csproj", "{F411ADBE-65E5-4D39-AE4A-4485D8BC9B3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Data", "Infrastructure.Data\Infrastructure.Data.csproj", "{928867A2-E301-49F0-9C07-26A4109C49EA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eShop.Infrastructure.Data", "Infrastructure.Data\eShop.Infrastructure.Data.csproj", "{928867A2-E301-49F0-9C07-26A4109C49EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.IoC", "Infrastructure.IoC\Infrastructure.IoC.csproj", "{F32EA674-DAFF-41FC-994F-34B8CA68CC47}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eShop.Infrastructure.IoC", "Infrastructure.IoC\eShop.Infrastructure.IoC.csproj", "{F32EA674-DAFF-41FC-994F-34B8CA68CC47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Main", "Main\Main.csproj", "{436A89CE-1DE9-4A68-A303-C90650643644}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eShop.Main", "Main\eShop.Main.csproj", "{436A89CE-1DE9-4A68-A303-C90650643644}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -13,9 +13,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\eShop.ServiceDefaults\eShop.ServiceDefaults.csproj" />
-    <ProjectReference Include="..\Infrastructure.Data\Infrastructure.Data.csproj" />
-    <ProjectReference Include="..\Infrastructure.IoC\Infrastructure.IoC.csproj" />
-    <ProjectReference Include="..\Main\Main.csproj" />
+    <ProjectReference Include="..\Infrastructure.Data\eShop.Infrastructure.Data.csproj" />
+    <ProjectReference Include="..\Infrastructure.IoC\eShop.Infrastructure.IoC.csproj" />
+    <ProjectReference Include="..\Main\eShop.Main.csproj" />
   </ItemGroup>
 
 </Project>
