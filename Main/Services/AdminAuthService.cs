@@ -31,7 +31,7 @@ namespace Main.Services
                 var response = await _userRepository.GetAsync(x => x.Username.ToLower() == request.Username.ToLower());
                 var user = response?.FirstOrDefault();
 
-                if (user is null && user.Role.ToString() != Role.Admin.ToString())
+                if (user is null || user.Role.ToString() != Role.Admin.ToString())
                 {
                     return new ApiResponse<LoginDTO>
                     {
