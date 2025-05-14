@@ -9,6 +9,9 @@ using Infrastructure.IoC;
 using FluentValidation;
 using eShop.Main.Validations;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +30,23 @@ builder.Services.AddCors(policy => policy.AddPolicy("MyPolicy", builder =>
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+var singingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]));
+var tokenValidationParameters = new TokenValidationParameters()
+{
+    IssuerSigningKey = singingKey,
+    ValidateIssuer = false,
+    ValidateAudience = false,
+    ValidateLifetime = true,
+    ClockSkew = TimeSpan.Zero
+};
+
+builder.Services.AddAuthentication(x => x.DefaultAuthenticateScheme = JwtBearerDefaults
+        .AuthenticationScheme)
+        .AddJwtBearer(jwt =>
+        {
+            jwt.TokenValidationParameters = tokenValidationParameters;
+        });
 
 builder.Services.AddScoped(typeof(IUnitOfWork<>), typeof(SqlUnitOfWork<>));
 builder.Services.AddIoCService();
@@ -146,6 +166,8 @@ app.UseHttpsRedirection();
 app.UseCors("MyPolicy");
 
 app.UseAuthorization();
+
+app.UseAuthentication();
 
 app.MapControllers();
 
