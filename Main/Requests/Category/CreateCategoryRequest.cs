@@ -1,4 +1,5 @@
 ﻿namespace eShop.Main.Requests.Category;
+#nullable disable
 
 public class CreateCategoryRequest
 {

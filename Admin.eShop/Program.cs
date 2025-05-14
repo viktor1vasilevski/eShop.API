@@ -6,6 +6,9 @@ using Infrastructure.Data.Repositories;
 using Main.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.IoC;
+using FluentValidation;
+using eShop.Main.Validations;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +30,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped(typeof(IUnitOfWork<>), typeof(SqlUnitOfWork<>));
 builder.Services.AddIoCService();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateCategoryRequestValidator>(ServiceLifetime.Transient);
+builder.Services.AddFluentValidationAutoValidation();
 
 var app = builder.Build();
 
@@ -96,6 +101,32 @@ using (var scope = app.Services.CreateScope())
             dbContext.SaveChanges();
 
         }
+
+        var customerExist = dbContext.Users.Any(x => x.Role == Role.Customer);
+
+        if (!customerExist) 
+        {
+            var saltKey = PasswordHasher.GenerateSalt();
+            var adminUser = new User
+            {
+                FirstName = "Test",
+                LastName = "Test",
+                Email = "test@example.com",
+                Username = "test",
+                Role = Role.Customer,
+                PasswordHash = PasswordHasher.HashPassword("Test@123", saltKey),
+                SaltKey = Convert.ToBase64String(saltKey),
+                CreatedBy = "Admin",
+                Created = DateTime.Now,
+                LastModifiedBy = null,
+                LastModified = null
+            };
+
+            dbContext.Users.Add(adminUser);
+            dbContext.SaveChanges();
+        }
+
+
     }
     catch (Exception ex)
     {
