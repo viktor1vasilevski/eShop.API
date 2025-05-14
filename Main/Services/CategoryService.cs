@@ -100,7 +100,7 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
             return new ApiResponse<CategoryDTO>
             {
                 Success = true,
-                NotificationType = NotificationType.Success,
+                NotificationType = NotificationType.Created,
                 Message = CategoryConstants.CATEGORY_SUCCESSFULLY_CREATED
             };
         }
