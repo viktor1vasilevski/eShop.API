@@ -28,6 +28,14 @@ public class CategoryController(ICategoryService categoryService) : BaseControll
         return HandleResponse(response);
     }
 
+    [HttpPut("Edit/{id}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    public IActionResult Edit([FromRoute] Guid id, [FromBody] EditCategoryRequest request)
+    {
+        var response = _categoryService.EditCategory(id, request);
+        return HandleResponse(response);
+    }
+
     [HttpGet("Get/{id}")]
     public IActionResult GetById([FromRoute] Guid id)
     {

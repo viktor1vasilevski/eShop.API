@@ -120,7 +120,41 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
 
     public ApiResponse<CategoryDTO> EditCategory(Guid id, EditCategoryRequest request)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var category = _categoryRepository.GetById(id);
+            if (category is null)
+                return new ApiResponse<CategoryDTO> { Success = false, NotificationType = NotificationType.BadRequest, Message = CategoryConstants.CATEGORY_DOESNT_EXIST };
+
+            var editedCategoryNameExist = _categoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower() && x.Id != id);
+            if (editedCategoryNameExist)
+                return new ApiResponse<CategoryDTO> { Success = false, NotificationType = NotificationType.BadRequest, Message = CategoryConstants.CATEGORY_EXISTS };
+
+            category.Name = request.Name;
+
+            _categoryRepository.Update(category);
+            _uow.SaveChanges();
+
+            return new ApiResponse<CategoryDTO>
+            {
+                Success = true,
+                NotificationType = NotificationType.Success,
+                Message = CategoryConstants.CATEGORY_SUCCESSFULLY_UPDATE,
+                Data = new CategoryDTO { Id = id, Name = category.Name }
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : Name: {Name}", nameof(EditCategory),
+                    DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), request.Name);
+
+            return new ApiResponse<CategoryDTO>
+            {
+                Success = false,
+                NotificationType = NotificationType.ServerError,
+                Message = CategoryConstants.ERROR_EDITING_CATEGORY
+            };
+        }
     }
 
     public ApiResponse<CategoryDetailsDTO> GetCategoryById(Guid id)
