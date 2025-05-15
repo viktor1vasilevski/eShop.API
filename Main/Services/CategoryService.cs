@@ -1,7 +1,7 @@
 ﻿using Domain.Interfaces;
 using Domain.Models;
 using eShop.Main.Constants;
-using eShop.Main.DTOs;
+using eShop.Main.DTOs.Category;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Category;
 using Infrastructure.Data.Context;
@@ -114,6 +114,46 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
                 Success = false,
                 NotificationType = NotificationType.ServerError,
                 Message = CategoryConstants.ERROR_CREATING_CATEGORY
+            };
+        }
+    }
+
+    public ApiResponse<CategoryDTO> EditCategory(Guid id, EditCategoryRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public ApiResponse<CategoryDetailsDTO> GetCategoryById(Guid id)
+    {
+        try
+        {
+            var category = _categoryRepository.GetById(id);
+
+            if (category is null)
+                return new ApiResponse<CategoryDetailsDTO>
+                {
+                    Success = false,
+                    NotificationType = NotificationType.BadRequest,
+                    Message = CategoryConstants.CATEGORY_DOESNT_EXIST
+                };
+
+            return new ApiResponse<CategoryDetailsDTO>
+            {
+                Success = true,
+                NotificationType = NotificationType.Success,
+                Data = new CategoryDetailsDTO { Id = category.Id, Name = category.Name }
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : CategoryId: {CategoryId}", nameof(GetCategoryById),
+                        DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), id);
+
+            return new ApiResponse<CategoryDetailsDTO>
+            {
+                Success = false,
+                NotificationType = NotificationType.ServerError,
+                Message = CategoryConstants.ERROR_GET_CATEGORY
             };
         }
     }

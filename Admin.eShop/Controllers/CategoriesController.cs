@@ -27,4 +27,11 @@ public class CategoryController(ICategoryService categoryService) : BaseControll
         var response = _categoryService.CreateCategory(request);
         return HandleResponse(response);
     }
+
+    [HttpGet("Get/{id}")]
+    public IActionResult GetById([FromRoute] Guid id)
+    {
+        var response = _categoryService.GetCategoryById(id);
+        return HandleResponse(response);
+    }
 }

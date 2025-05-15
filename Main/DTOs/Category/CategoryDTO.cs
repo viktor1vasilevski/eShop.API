@@ -1,4 +1,4 @@
-﻿namespace eShop.Main.DTOs;
+﻿namespace eShop.Main.DTOs.Category;
 
 public class CategoryDTO
 {
