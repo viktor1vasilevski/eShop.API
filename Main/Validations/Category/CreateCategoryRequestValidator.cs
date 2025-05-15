@@ -1,7 +1,7 @@
 ﻿using eShop.Main.Requests.Category;
 using FluentValidation;
 
-namespace eShop.Main.Validations;
+namespace eShop.Main.Validations.Category;
 
 public class CreateCategoryRequestValidator : AbstractValidator<CreateCategoryRequest>
 {

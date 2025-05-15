@@ -7,11 +7,11 @@ using Main.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.IoC;
 using FluentValidation;
-using eShop.Main.Validations;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using eShop.Main.Validations.Category;
 
 var builder = WebApplication.CreateBuilder(args);
 

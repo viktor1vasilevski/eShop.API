@@ -13,7 +13,7 @@ public static class ServiceCollectionExtension
 
         services.AddScoped<IAdminAuthService, AdminAuthService>();
         services.AddScoped<ICategoryService, CategoryService>();
-        //services.AddScoped<ISubcategoryService, SubcategoryService>();
+        services.AddScoped<ISubcategoryService, SubcategoryService>();
         //services.AddScoped<IProductService, ProductService>();
         //services.AddScoped<IOrderService, OrderService>();
         //services.AddScoped<IUserService, UserService>();
