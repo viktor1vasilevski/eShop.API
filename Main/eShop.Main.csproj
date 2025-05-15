@@ -17,8 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\Subcategory\" />
-    <Folder Include="Requests\Subcategory\" />
     <Folder Include="Validations\Subcategory\" />
   </ItemGroup>
 

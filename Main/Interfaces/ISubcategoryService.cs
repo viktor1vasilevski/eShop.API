@@ -1,5 +1,10 @@
-﻿namespace eShop.Main.Interfaces;
+﻿using eShop.Main.DTOs.Subcategory;
+using eShop.Main.Requests.Subcategory;
+using Main.Responses;
+
+namespace eShop.Main.Interfaces;
 
 public interface ISubcategoryService
 {
+    ApiResponse<List<SubcategoryDTO>> GetSubcategories(SubcategoryRequest request);
 }
