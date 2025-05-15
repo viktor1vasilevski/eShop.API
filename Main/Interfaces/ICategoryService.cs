@@ -10,4 +10,5 @@ public interface ICategoryService
     ApiResponse<CategoryDTO> CreateCategory(CreateCategoryRequest request);
     ApiResponse<CategoryDTO> EditCategory(Guid id, EditCategoryRequest request);
     ApiResponse<CategoryDetailsDTO> GetCategoryById(Guid id);
+    ApiResponse<List<SelectCategoryListItemDTO>> GetCategoriesDropdownList();
 }

@@ -29,7 +29,6 @@ public class CategoryController(ICategoryService categoryService) : BaseControll
     }
 
     [HttpPut("Edit/{id}")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public IActionResult Edit([FromRoute] Guid id, [FromBody] EditCategoryRequest request)
     {
         var response = _categoryService.EditCategory(id, request);
@@ -40,6 +39,13 @@ public class CategoryController(ICategoryService categoryService) : BaseControll
     public IActionResult GetById([FromRoute] Guid id)
     {
         var response = _categoryService.GetCategoryById(id);
+        return HandleResponse(response);
+    }
+
+    [HttpGet("GetCategoriesDropdownList")]
+    public IActionResult GetCategoriesDropdownList()
+    {
+        var response = _categoryService.GetCategoriesDropdownList();
         return HandleResponse(response);
     }
 }

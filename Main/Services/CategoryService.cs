@@ -191,4 +191,36 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
             };
         }
     }
+
+    public ApiResponse<List<SelectCategoryListItemDTO>> GetCategoriesDropdownList()
+    {
+        try
+        {
+            var categories = _categoryRepository.GetAsQueryable();
+
+            var categoriesDropdownDTO = categories.Select(x => new SelectCategoryListItemDTO
+            {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList();
+
+            return new ApiResponse<List<SelectCategoryListItemDTO>>
+            {
+                Success = true,
+                Data = categoriesDropdownDTO
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp}", nameof(GetCategoriesDropdownList),
+                    DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
+
+            return new ApiResponse<List<SelectCategoryListItemDTO>>
+            {
+                Success = false,
+                Message = CategoryConstants.ERROR_RETRIEVING_CATEGORIES,
+                NotificationType = NotificationType.ServerError
+            };
+        }
+    }
 }
