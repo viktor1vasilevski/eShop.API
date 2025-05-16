@@ -86,14 +86,11 @@ namespace Main.Services
 
         private string GenerateJwtToken(User user)
         {
-            var secretKey = _configuration["JwtSettings:Secret"];
+            var secretKey = _configuration["JwtSettings:Secret"] ?? "AlternativeSecretKeyOfAtLeast32Characters!";
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
-            {
-            new Claim(ClaimTypes.Role, user.Role.ToString()),
-        };
+            var claims = new[] { new Claim(ClaimTypes.Role, user.Role.ToString()) };
 
             var token = new JwtSecurityToken(
                 claims: claims,
