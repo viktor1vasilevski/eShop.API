@@ -28,5 +28,12 @@ namespace eShop.Admin.Controllers
             var response = _subcategoryService.CreateSubcategory(request);
             return HandleResponse(response);
         }
+
+        [HttpGet("Get/{id}")]
+        public IActionResult GetById([FromRoute] Guid id)
+        {
+            var response = _subcategoryService.GetSubcategoryById(id);
+            return HandleResponse(response);
+        }
     }
 }

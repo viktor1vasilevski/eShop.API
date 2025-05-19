@@ -138,4 +138,48 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
             };
         }
     }
+
+    public ApiResponse<SubcategoryDTO> GetSubcategoryById(Guid id)
+    {
+        try
+        {
+            if (_subcategoryRepository.Exists(x => x.Id == id))
+            {
+                var subcategory = _subcategoryRepository.GetAsQueryable(x => x.Id == id, null,
+                    x => x.Include(x => x.Products).Include(x => x.Category)).FirstOrDefault();
+
+                return new ApiResponse<SubcategoryDTO>
+                {
+                    Success = true,
+                    NotificationType = NotificationType.Success,
+                    Data = new SubcategoryDTO()
+                    {
+                        Id = subcategory.Id,
+                        Name = subcategory.Name,
+                        CategoryId = subcategory.Category.Id,
+                        Category = subcategory.Category.Name
+                    }
+                };
+            }
+
+            return new ApiResponse<SubcategoryDTO>
+            {
+                Success = false,
+                NotificationType = NotificationType.BadRequest,
+                Message = SubcategoryConstants.SUBCATEGORY_DOESNT_EXIST,
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : SubcategoryId: {CategoryId}",
+                nameof(GetSubcategoryById), DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), id);
+
+            return new ApiResponse<SubcategoryDTO>
+            {
+                Success = false,
+                NotificationType = NotificationType.ServerError,
+                Message = SubcategoryConstants.ERROR_GET_SUBCATEGORY_BY_ID,
+            };
+        }
+    }
 }
