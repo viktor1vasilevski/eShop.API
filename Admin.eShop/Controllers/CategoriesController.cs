@@ -1,6 +1,8 @@
 ﻿using Admin.eShop.Controllers;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Category;
+using Main.Enums;
+using Main.Responses;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +42,24 @@ public class CategoryController(ICategoryService categoryService) : BaseControll
     {
         var response = _categoryService.GetCategoryById(id);
         return HandleResponse(response);
+    }
+
+    [HttpDelete("Delete/{id}")]
+    public IActionResult Delete([FromRoute] Guid id)
+    {
+        bool deleted = _categoryService.DeleteCategory(id);
+
+        if (!deleted)
+        {
+            return NotFound(new ApiResponse<string>
+            {
+                Success = false,
+                Message = "Entity not found",
+                NotificationType = NotificationType.BadRequest
+            });
+        }
+
+        return NoContent();
     }
 
     [HttpGet("GetCategoriesDropdownList")]

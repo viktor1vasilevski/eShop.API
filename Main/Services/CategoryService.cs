@@ -8,6 +8,7 @@ using Infrastructure.Data.Context;
 using Main.Enums;
 using Main.Extensions;
 using Main.Responses;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace eShop.Main.Services;
@@ -222,5 +223,35 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
                 NotificationType = NotificationType.ServerError
             };
         }
+    }
+
+    public bool DeleteCategory(Guid id)
+    {
+        try
+        {
+            var category = _categoryRepository.GetAsQueryable(x => x.Id == id && x.Name != "UNCATEGORIZED", null,
+                    x => x.Include(x => x.Subcategories).ThenInclude(x => x.Products)).FirstOrDefault();
+
+            if (category is null) return false;
+
+            if (HasRelatedEntities(category)) return false;
+
+            _categoryRepository.Delete(category);
+            _uow.SaveChanges();
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : CategoryId: {CategoryId}",
+                        nameof(DeleteCategory), DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), id);
+            return false;
+        }
+    }
+
+    private bool HasRelatedEntities(Category category)
+    {
+        return category.Subcategories?.Any() == true ||
+               category.Subcategories?.FirstOrDefault()?.Products?.Any() == true;
     }
 }
