@@ -21,5 +21,12 @@ namespace eShop.Admin.Controllers
             var response = _subcategoryService.GetSubcategories(request);
             return HandleResponse(response);
         }
+
+        [HttpPost("Create")]
+        public IActionResult Create([FromBody] CreateSubcategoryRequest request)
+        {
+            var response = _subcategoryService.CreateSubcategory(request);
+            return HandleResponse(response);
+        }
     }
 }

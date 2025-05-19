@@ -16,6 +16,8 @@ namespace eShop.Main.Services;
 public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<SubcategoryService> _logger) : ISubcategoryService
 {
     private readonly IGenericRepository<Subcategory> _subcategoryRepository = _uow.GetGenericRepository<Subcategory>();
+    private readonly IGenericRepository<Category> _categoryRepository = _uow.GetGenericRepository<Category>();
+
     public ApiResponse<List<SubcategoryDTO>> GetSubcategories(SubcategoryRequest request)
     {
         try
@@ -84,6 +86,55 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
                 Success = false,
                 Message = SubcategoryConstants.ERROR_RETRIEVING_SUBCATEGORIES,
                 NotificationType = NotificationType.ServerError,
+            };
+        }
+    }
+    public ApiResponse<SubcategoryDTO> CreateSubcategory(CreateSubcategoryRequest request)
+    {
+        try
+        {
+            if (_subcategoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower() && x.CategoryId == request.CategoryId))
+                return new ApiResponse<SubcategoryDTO>()
+                {
+                    Success = false,
+                    Message = SubcategoryConstants.SUBCATEGORY_EXISTS,
+                    NotificationType = NotificationType.BadRequest
+                };
+
+            if (!_categoryRepository.Exists(x => x.Id == request.CategoryId))
+                return new ApiResponse<SubcategoryDTO>()
+                {
+                    Success = false,
+                    Message = CategoryConstants.CATEGORY_DOESNT_EXIST,
+                    NotificationType = NotificationType.BadRequest
+                };
+
+            var entity = new Subcategory()
+            {
+                Name = request.Name,
+                CategoryId = request.CategoryId
+            };
+
+            _subcategoryRepository.Insert(entity);
+            _uow.SaveChanges();
+
+            return new ApiResponse<SubcategoryDTO>
+            {
+                Success = true,
+                NotificationType = NotificationType.Success,
+                Message = SubcategoryConstants.SUBCATEGORY_SUCCESSFULLY_CREATED
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : Name: {Name}, CategoryId: {CategoryId}",
+                nameof(CreateSubcategory) ,DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), request.Name, request.CategoryId);
+
+            return new ApiResponse<SubcategoryDTO>
+            {
+                Success = false,
+                NotificationType = NotificationType.ServerError,
+                Message = SubcategoryConstants.ERROR_CREATING_SUBCATEGORY,
             };
         }
     }
