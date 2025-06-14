@@ -12,7 +12,7 @@ public class CreateSubcategoryRequestValidator : AbstractValidator<CreateSubcate
             .WithMessage("Category Id must be a valid");
 
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Category Name is required.")
-            .MinimumLength(3).WithMessage("Category Name must be at least 3 characters long.");
+            .NotEmpty().WithMessage("Subcategory Name is required.")
+            .MinimumLength(3).WithMessage("Subcategory Name must be at least 3 characters long.");
     }
 }

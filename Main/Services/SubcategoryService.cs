@@ -256,7 +256,7 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
                     Message = SubcategoryConstants.SUBCATEGORY_DOESNT_EXIST
                 };
 
-            if (_subcategoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower() && x.Id != id))
+            if (_subcategoryRepository.Exists(x => string.Equals(x.Name, request.Name, StringComparison.OrdinalIgnoreCase) && x.Id != id))
                 return new ApiResponse<CategoryDTO>
                 {
                     Success = false,
