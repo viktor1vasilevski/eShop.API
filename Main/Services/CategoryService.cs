@@ -1,5 +1,6 @@
 ﻿using Domain.Interfaces;
 using Domain.Models;
+using eShop.Domain.Exceptions;
 using eShop.Main.Constants;
 using eShop.Main.DTOs.Category;
 using eShop.Main.Interfaces;
@@ -21,8 +22,8 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
     {
         try
         {
-            var categories = _categoryRepository.GetAsQueryableWhereIf(c => c
-                .WhereIf(!String.IsNullOrEmpty(request.Name), x => x.Name.ToLower().Contains(request.Name.ToLower())), null, null);
+            var categories = _categoryRepository.GetAsQueryableWhereIf(
+                filter: x => x.WhereIf(!String.IsNullOrEmpty(request.Name), x => x.Name.ToLower().Contains(request.Name.ToLower())));
 
             if (!string.IsNullOrEmpty(request.SortBy) && !string.IsNullOrEmpty(request.SortDirection))
             {
@@ -83,34 +84,46 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
             };
         }
     }
-    public ApiResponse<CategoryDTO> CreateCategory(CreateCategoryRequest request)
+
+    public ApiResponse<string> CreateCategory(CreateCategoryRequest request)
     {
         try
         {
             if (_categoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower()))
-                return new ApiResponse<CategoryDTO>()
+                return new ApiResponse<string>()
                 {
                     Success = false,
                     Message = CategoryConstants.CATEGORY_EXISTS,
-                    NotificationType = NotificationType.BadRequest
+                    NotificationType = NotificationType.Conflict
                 };
 
-            _categoryRepository.Insert(new Category { Name = request.Name });
+            var category = new Category(request.Name);
+
+            _categoryRepository.Insert(category);
             _uow.SaveChanges();
 
-            return new ApiResponse<CategoryDTO>
+            return new ApiResponse<string>
             {
                 Success = true,
                 NotificationType = NotificationType.Created,
                 Message = CategoryConstants.CATEGORY_SUCCESSFULLY_CREATED
             };
         }
+        catch (DomainValidationException ex)
+        {
+            return new ApiResponse<string>
+            {
+                Success = false,
+                NotificationType = NotificationType.BadRequest,
+                Message = ex.Message
+            };
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} Name: {Name}", nameof(CreateCategory),
-                    DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), request.Name);
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), request.Name);
 
-            return new ApiResponse<CategoryDTO>
+            return new ApiResponse<string>
             {
                 Success = false,
                 NotificationType = NotificationType.ServerError,
@@ -125,13 +138,22 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         {
             var category = _categoryRepository.GetById(id);
             if (category is null)
-                return new ApiResponse<CategoryDTO> { Success = false, NotificationType = NotificationType.BadRequest, Message = CategoryConstants.CATEGORY_DOESNT_EXIST };
+                return new ApiResponse<CategoryDTO> 
+                { 
+                    Success = false, 
+                    NotificationType = NotificationType.NotFound, 
+                    Message = CategoryConstants.CATEGORY_DOESNT_EXIST 
+                };
 
-            var editedCategoryNameExist = _categoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower() && x.Id != id);
-            if (editedCategoryNameExist)
-                return new ApiResponse<CategoryDTO> { Success = false, NotificationType = NotificationType.BadRequest, Message = CategoryConstants.CATEGORY_EXISTS };
+            if (_categoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower() && x.Id != id))
+                return new ApiResponse<CategoryDTO> 
+                { 
+                    Success = false, 
+                    NotificationType = NotificationType.Conflict, 
+                    Message = CategoryConstants.CATEGORY_EXISTS 
+                };
 
-            category.Name = request.Name;
+            category.Update(request.Name);
 
             _categoryRepository.Update(category);
             _uow.SaveChanges();
@@ -140,14 +162,22 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
             {
                 Success = true,
                 NotificationType = NotificationType.Success,
-                Message = CategoryConstants.CATEGORY_SUCCESSFULLY_UPDATE,
-                Data = new CategoryDTO { Id = id, Name = category.Name }
+                Message = CategoryConstants.CATEGORY_SUCCESSFULLY_UPDATE
+            };
+        }
+        catch (DomainValidationException ex)
+        {
+            return new ApiResponse<CategoryDTO>
+            {
+                Success = false,
+                NotificationType = NotificationType.BadRequest,
+                Message = ex.Message
             };
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : Name: {Name}", nameof(EditCategory),
-                    DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), request.Name);
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), request.Name);
 
             return new ApiResponse<CategoryDTO>
             {
@@ -168,7 +198,7 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
                 return new ApiResponse<CategoryDetailsDTO>
                 {
                     Success = false,
-                    NotificationType = NotificationType.BadRequest,
+                    NotificationType = NotificationType.NotFound,
                     Message = CategoryConstants.CATEGORY_DOESNT_EXIST
                 };
 
@@ -225,27 +255,52 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         }
     }
 
-    public bool DeleteCategory(Guid id)
+    public ApiResponse<string> DeleteCategory(Guid id)
     {
         try
         {
-            var category = _categoryRepository.GetAsQueryable(x => x.Id == id && x.Name != "UNCATEGORIZED", null,
-                    x => x.Include(x => x.Subcategories).ThenInclude(x => x.Products)).FirstOrDefault();
+            var category = _categoryRepository.GetAsQueryable(
+                 filter : x => x.Id == id && x.Name != "UNCATEGORIZED",
+                 include: x => x.Include(x => x.Subcategories).ThenInclude(x => x.Products)
+                 ).FirstOrDefault();
 
-            if (category is null) return false;
+            if (category is null)
+                return new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = CategoryConstants.CATEGORY_DOESNT_EXIST,
+                    NotificationType = NotificationType.NotFound
+                };
 
-            if (HasRelatedEntities(category)) return false;
+            if (HasRelatedEntities(category))
+                return new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = CategoryConstants.CATEGORY_HAS_RELATED_ENTITIES,
+                    NotificationType = NotificationType.Conflict
+                };
 
             _categoryRepository.Delete(category);
             _uow.SaveChanges();
 
-            return true;
+            return new ApiResponse<string>
+            {
+                Success = true,
+                Message = CategoryConstants.CATEGORY_SUCCESSFULLY_DELETED,
+                NotificationType = NotificationType.Success
+            };
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : CategoryId: {CategoryId}",
                         nameof(DeleteCategory), DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), id);
-            return false;
+
+            return new ApiResponse<string>
+            {
+                Success = false,
+                Message = CategoryConstants.ERROR_DELETING_CATEGORY,
+                NotificationType = NotificationType.ServerError
+            };
         }
     }
 
@@ -254,4 +309,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         return category.Subcategories?.Any() == true ||
                category.Subcategories?.FirstOrDefault()?.Products?.Any() == true;
     }
+
+    
 }

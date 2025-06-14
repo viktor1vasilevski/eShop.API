@@ -69,10 +69,7 @@ using (var scope = app.Services.CreateScope())
         var uncatgorizedCategory = dbContext.Categories.Any(x => x.Name == "UNCATEGORIZED");
         if (!uncatgorizedCategory)
         {
-            var category = new Category
-            {
-                Name = "UNCATEGORIZED"
-            };
+            var category = new Category("UNCATEGORIZED");
 
             dbContext.Categories.Add(category);
             dbContext.SaveChanges();

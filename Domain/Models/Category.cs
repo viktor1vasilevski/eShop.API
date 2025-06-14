@@ -1,17 +1,29 @@
 ﻿using Domain.Models.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using eShop.Domain.Exceptions;
 
-namespace Domain.Models
+namespace Domain.Models;
+
+public class Category : AuditableBaseEntity
 {
-    public class Category : AuditableBaseEntity
+    public string Name { get; private set; } = string.Empty;
+
+    public virtual ICollection<Subcategory>? Subcategories { get; set; }
+
+
+    public Category(string name)
     {
-        public string Name { get; set; }
+        SetName(name);
+    }
 
+    public void Update(string name) => SetName(name);
+    private void SetName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new DomainValidationException("Category name cannot be empty.");
 
-        public virtual ICollection<Subcategory>? Subcategories { get; set; }
+        if (name.Length < 3)
+            throw new DomainValidationException("Category name must be at least 3 characters long.");
+
+        Name = name;
     }
 }

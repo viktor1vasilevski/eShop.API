@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eShop.Admin.Controllers;
 
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 [Route("api/[controller]")]
 [ApiController]
 public class CategoryController(ICategoryService categoryService) : BaseController
@@ -47,19 +47,8 @@ public class CategoryController(ICategoryService categoryService) : BaseControll
     [HttpDelete("Delete/{id}")]
     public IActionResult Delete([FromRoute] Guid id)
     {
-        bool deleted = _categoryService.DeleteCategory(id);
-
-        if (!deleted)
-        {
-            return NotFound(new ApiResponse<string>
-            {
-                Success = false,
-                Message = "Entity not found",
-                NotificationType = NotificationType.BadRequest
-            });
-        }
-
-        return NoContent();
+        var response = _categoryService.DeleteCategory(id);
+        return HandleResponse(response);
     }
 
     [HttpGet("GetCategoriesDropdownList")]

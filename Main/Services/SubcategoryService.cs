@@ -182,4 +182,33 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
             };
         }
     }
+
+    public bool DeleteSubcategory(Guid id)
+    {
+        try
+        {
+            var subcategory = _subcategoryRepository.GetAsQueryable(x => x.Id == id && x.Name != "UNCATEGORIZED", null,
+                    x => x.Include(x => x.Products)).FirstOrDefault();
+
+            if (subcategory is null) return false;
+
+            if (HasRelatedEntities(subcategory)) return false;
+
+            _subcategoryRepository.Delete(subcategory);
+            _uow.SaveChanges();
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : CategoryId: {CategoryId}",
+                        nameof(DeleteSubcategory), DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), id);
+
+            return false;
+        }
+    }
+    private bool HasRelatedEntities(Subcategory subcategory)
+    {
+        return subcategory.Products?.Any() == true;
+    }
 }

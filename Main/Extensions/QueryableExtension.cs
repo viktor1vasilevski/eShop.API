@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 
-namespace Main.Extensions
+namespace Main.Extensions;
+
+public static class QueryableExtension
 {
-    public static class QueryableExtension
+    public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)
     {
-        public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)
-        {
-            return condition ? query.Where(predicate) : query;
-        }
+        return condition ? query.Where(predicate) : query;
     }
 }
