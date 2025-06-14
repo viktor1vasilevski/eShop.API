@@ -74,7 +74,7 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : Name: {Name}", nameof(GetCategories),
-                DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), request.Name);
+                DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), request.Name);
 
             return new ApiResponse<List<CategoryDTO>>
             {
@@ -120,7 +120,7 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} Name: {Name}", nameof(CreateCategory),
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} CategoryName: {CategoryName}", nameof(CreateCategory),
                     DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), request.Name);
 
             return new ApiResponse<string>
@@ -162,7 +162,8 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
             {
                 Success = true,
                 NotificationType = NotificationType.Success,
-                Message = CategoryConstants.CATEGORY_SUCCESSFULLY_UPDATE
+                Message = CategoryConstants.CATEGORY_SUCCESSFULLY_UPDATE,
+                Data = new CategoryDTO { Id = id, Name = request.Name }
             };
         }
         catch (DomainValidationException ex)
@@ -176,8 +177,8 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : Name: {Name}", nameof(EditCategory),
-                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), request.Name);
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : CategoryId: {CategoryId}, CategoryName: {CategoryName}", nameof(EditCategory),
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), id, request.Name);
 
             return new ApiResponse<CategoryDTO>
             {
@@ -212,7 +213,7 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : CategoryId: {CategoryId}", nameof(GetCategoryById),
-                        DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), id);
+                        DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), id);
 
             return new ApiResponse<CategoryDetailsDTO>
             {
@@ -244,7 +245,7 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp}", nameof(GetCategoriesDropdownList),
-                    DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
             return new ApiResponse<List<SelectCategoryListItemDTO>>
             {
@@ -293,7 +294,7 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : CategoryId: {CategoryId}",
-                        nameof(DeleteCategory), DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), id);
+                        nameof(DeleteCategory), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), id);
 
             return new ApiResponse<string>
             {
