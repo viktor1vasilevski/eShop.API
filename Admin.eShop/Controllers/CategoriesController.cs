@@ -16,35 +16,35 @@ public class CategoryController(ICategoryService categoryService) : BaseControll
 {
     private readonly ICategoryService _categoryService = categoryService;
 
-    [HttpGet("Get")]
+    [HttpGet]
     public IActionResult Get([FromQuery] CategoryRequest request)
     {
         var response = _categoryService.GetCategories(request);
         return HandleResponse(response);
     }
 
-    [HttpPost("Create")]
+    [HttpPost]
     public IActionResult Create([FromBody] CreateCategoryRequest request)
     {
         var response = _categoryService.CreateCategory(request);
         return HandleResponse(response);
     }
 
-    [HttpPut("Edit/{id}")]
+    [HttpPut("{id}")]
     public IActionResult Edit([FromRoute] Guid id, [FromBody] EditCategoryRequest request)
     {
         var response = _categoryService.EditCategory(id, request);
         return HandleResponse(response);
     }
 
-    [HttpGet("Get/{id}")]
+    [HttpGet("{id}")]
     public IActionResult GetById([FromRoute] Guid id)
     {
         var response = _categoryService.GetCategoryById(id);
         return HandleResponse(response);
     }
 
-    [HttpDelete("Delete/{id}")]
+    [HttpDelete("{id}")]
     public IActionResult Delete([FromRoute] Guid id)
     {
         var response = _categoryService.DeleteCategory(id);

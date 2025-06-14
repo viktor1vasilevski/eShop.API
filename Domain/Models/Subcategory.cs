@@ -1,6 +1,5 @@
 ﻿using Domain.Models.Base;
 using eShop.Domain.Exceptions;
-#nullable enable
 
 namespace Domain.Models;
 
@@ -13,30 +12,30 @@ public class Subcategory : AuditableBaseEntity
     public virtual ICollection<Product>? Products { get; set; }
 
 
-    public Subcategory(Guid id, string name)
+    public Subcategory(Guid categoryId, string name)
     {
-        Initialize(id, name);
+        Initialize(categoryId, name);
     }
 
-    public void Update(Guid id, string name) => ApplyChanges(id, name);
+    public void Update(Guid categoryId, string name) => ApplyChanges(categoryId, name);
 
-    private void Initialize(Guid id, string name)
+    private void Initialize(Guid categoryId, string name)
     {
-        Validate(id, name);
-        Id = id;
+        Validate(categoryId, name);
+        CategoryId = categoryId;
         Name = name;
     }
 
-    private void ApplyChanges(Guid id, string name)
+    private void ApplyChanges(Guid categoryId, string name)
     {
-        Validate(id, name);
-        Id = id;
+        Validate(categoryId, name);
+        CategoryId = categoryId;
         Name = name;
     }
 
-    private void Validate(Guid id, string name)
+    private void Validate(Guid categoryId, string name)
     {
-        if (id == Guid.Empty)
+        if (categoryId == Guid.Empty)
             throw new DomainValidationException("Subcategory Id cannot be empty.");
 
         if (string.IsNullOrWhiteSpace(name))

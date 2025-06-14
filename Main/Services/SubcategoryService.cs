@@ -1,8 +1,11 @@
 ﻿using Domain.Interfaces;
 using Domain.Models;
+using eShop.Domain.Exceptions;
 using eShop.Main.Constants;
+using eShop.Main.DTOs.Category;
 using eShop.Main.DTOs.Subcategory;
 using eShop.Main.Interfaces;
+using eShop.Main.Requests.Category;
 using eShop.Main.Requests.Subcategory;
 using Infrastructure.Data.Context;
 using Main.Enums;
@@ -79,7 +82,7 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
         catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : Name: {Name}, CategoryId: {CategoryId}",
-                nameof(GetSubcategories) ,DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), request.Name, request.CategoryId);
+                nameof(GetSubcategories) ,DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), request.Name, request.CategoryId);
 
             return new ApiResponse<List<SubcategoryDTO>>()
             {
@@ -89,24 +92,24 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
             };
         }
     }
-    public ApiResponse<SubcategoryDTO> CreateSubcategory(CreateSubcategoryRequest request)
+    public ApiResponse<string> CreateSubcategory(CreateSubcategoryRequest request)
     {
         try
         {
-            if (_subcategoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower() && x.CategoryId == request.CategoryId))
-                return new ApiResponse<SubcategoryDTO>()
+            if (_subcategoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower()))
+                return new ApiResponse<string>()
                 {
                     Success = false,
                     Message = SubcategoryConstants.SUBCATEGORY_EXISTS,
-                    NotificationType = NotificationType.BadRequest
+                    NotificationType = NotificationType.Conflict
                 };
 
             if (!_categoryRepository.Exists(x => x.Id == request.CategoryId))
-                return new ApiResponse<SubcategoryDTO>()
+                return new ApiResponse<string>()
                 {
                     Success = false,
                     Message = CategoryConstants.CATEGORY_DOESNT_EXIST,
-                    NotificationType = NotificationType.BadRequest
+                    NotificationType = NotificationType.NotFound,
                 };
 
             var entity = new Subcategory(request.CategoryId, request.Name);
@@ -114,19 +117,28 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
             _subcategoryRepository.Insert(entity);
             _uow.SaveChanges();
 
-            return new ApiResponse<SubcategoryDTO>
+            return new ApiResponse<string>
             {
                 Success = true,
-                NotificationType = NotificationType.Success,
+                NotificationType = NotificationType.Created,
                 Message = SubcategoryConstants.SUBCATEGORY_SUCCESSFULLY_CREATED
+            };
+        }
+        catch (DomainValidationException ex)
+        {
+            return new ApiResponse<string>
+            {
+                Success = false,
+                NotificationType = NotificationType.BadRequest,
+                Message = ex.Message
             };
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : Name: {Name}, CategoryId: {CategoryId}",
-                nameof(CreateSubcategory) ,DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), request.Name, request.CategoryId);
+                nameof(CreateSubcategory) ,DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), request.Name, request.CategoryId);
 
-            return new ApiResponse<SubcategoryDTO>
+            return new ApiResponse<string>
             {
                 Success = false,
                 NotificationType = NotificationType.ServerError,
@@ -168,7 +180,7 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
         catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : SubcategoryId: {CategoryId}",
-                nameof(GetSubcategoryById), DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), id);
+                nameof(GetSubcategoryById), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), id);
 
             return new ApiResponse<SubcategoryDTO>
             {
@@ -179,32 +191,112 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
         }
     }
 
-    public bool DeleteSubcategory(Guid id)
+    public ApiResponse<string> DeleteSubcategory(Guid id)
     {
         try
         {
-            var subcategory = _subcategoryRepository.GetAsQueryable(x => x.Id == id && x.Name != "UNCATEGORIZED", null,
-                    x => x.Include(x => x.Products)).FirstOrDefault();
+            var subcategory = _subcategoryRepository.GetAsQueryable(
+                filter: x => x.Id == id && x.Name != "UNCATEGORIZED",
+                include: x => x.Include(x => x.Products)).FirstOrDefault();
 
-            if (subcategory is null) return false;
+            if (subcategory is null) 
+                return new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = SubcategoryConstants.SUBCATEGORY_DOESNT_EXIST,
+                    NotificationType = NotificationType.NotFound
+                };
 
-            if (HasRelatedEntities(subcategory)) return false;
+            if (HasRelatedEntities(subcategory)) 
+                return new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = SubcategoryConstants.SUBCATEGORY_HAS_RELATED_ENTITIES,
+                    NotificationType = NotificationType.Conflict
+                };
 
             _subcategoryRepository.Delete(subcategory);
             _uow.SaveChanges();
 
-            return true;
+            return new ApiResponse<string>
+            {
+                Success = true,
+                Message = SubcategoryConstants.SUBCATEGORY_SUCCESSFULLY_DELETED,
+                NotificationType = NotificationType.Success
+            };
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : CategoryId: {CategoryId}",
-                        nameof(DeleteSubcategory), DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), id);
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : SubcategoryId: {SubcategoryId}",
+                        nameof(DeleteSubcategory), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), id);
 
-            return false;
+            return new ApiResponse<string>
+            {
+                Success = false,
+                Message = SubcategoryConstants.ERROR_DELETING_SUBCATEGORY,
+                NotificationType = NotificationType.ServerError
+            };
         }
     }
     private bool HasRelatedEntities(Subcategory subcategory)
     {
         return subcategory.Products?.Any() == true;
+    }
+
+    public ApiResponse<CategoryDTO> EditSubcategory(Guid id, EditSubcategoryRequest request)
+    {
+        try
+        {
+            var subcategory = _subcategoryRepository.GetById(id);
+            if (subcategory is null)
+                return new ApiResponse<CategoryDTO>
+                {
+                    Success = false,
+                    NotificationType = NotificationType.NotFound,
+                    Message = SubcategoryConstants.SUBCATEGORY_DOESNT_EXIST
+                };
+
+            if (_subcategoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower() && x.Id != id))
+                return new ApiResponse<CategoryDTO>
+                {
+                    Success = false,
+                    NotificationType = NotificationType.Conflict,
+                    Message = SubcategoryConstants.SUBCATEGORY_EXISTS
+                };
+
+            subcategory.Update(request.CategoryId, request.Name);
+
+            _subcategoryRepository.Update(subcategory);
+            _uow.SaveChanges();
+
+            return new ApiResponse<CategoryDTO>
+            {
+                Success = true,
+                NotificationType = NotificationType.Success,
+                Message = SubcategoryConstants.SUBCATEGORY_SUCCESSFULLY_EDITED,
+                Data = new CategoryDTO { Id = id, Name = request.Name }
+            };
+        }
+        catch (DomainValidationException ex)
+        {
+            return new ApiResponse<CategoryDTO>
+            {
+                Success = false,
+                NotificationType = NotificationType.BadRequest,
+                Message = ex.Message
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : CategoryId: {CategoryId}, SubcategoryName: {SubcategoryName}", nameof(EditSubcategory),
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), id, request.Name);
+
+            return new ApiResponse<CategoryDTO>
+            {
+                Success = false,
+                NotificationType = NotificationType.ServerError,
+                Message = CategoryConstants.ERROR_EDITING_CATEGORY
+            };
+        }
     }
 }

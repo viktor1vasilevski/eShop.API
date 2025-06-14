@@ -16,8 +16,4 @@
     <ProjectReference Include="..\Infrastructure.Data\eShop.Infrastructure.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Validations\Subcategory\" />
-  </ItemGroup>
-
 </Project>

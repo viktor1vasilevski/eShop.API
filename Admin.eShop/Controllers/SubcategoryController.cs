@@ -1,5 +1,6 @@
 ﻿using Admin.eShop.Controllers;
 using eShop.Main.Interfaces;
+using eShop.Main.Requests.Category;
 using eShop.Main.Requests.Subcategory;
 using eShop.Main.Services;
 using Main.Enums;
@@ -18,43 +19,40 @@ namespace eShop.Admin.Controllers
         private readonly ISubcategoryService _subcategoryService = subcategoryService;
 
 
-        [HttpGet("Get")]
+        [HttpGet]
         public IActionResult Get([FromQuery] SubcategoryRequest request)
         {
             var response = _subcategoryService.GetSubcategories(request);
             return HandleResponse(response);
         }
 
-        [HttpPost("Create")]
-        public IActionResult Create([FromBody] CreateSubcategoryRequest request)
-        {
-            var response = _subcategoryService.CreateSubcategory(request);
-            return HandleResponse(response);
-        }
-
-        [HttpGet("Get/{id}")]
+        [HttpGet("{id}")]
         public IActionResult GetById([FromRoute] Guid id)
         {
             var response = _subcategoryService.GetSubcategoryById(id);
             return HandleResponse(response);
         }
 
-        [HttpDelete("Delete/{id}")]
+        [HttpPost]
+        public IActionResult Create([FromBody] CreateSubcategoryRequest request)
+        {
+            var response = _subcategoryService.CreateSubcategory(request);
+            return HandleResponse(response);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Edit([FromRoute] Guid id, [FromBody] EditSubcategoryRequest request)
+        {
+            var response = _subcategoryService.EditSubcategory(id, request);
+            return HandleResponse(response);
+        }
+
+
+        [HttpDelete("{id}")]
         public IActionResult Delete([FromRoute] Guid id)
         {
-            bool deleted = _subcategoryService.DeleteSubcategory(id);
-
-            if (!deleted)
-            {
-                return NotFound(new ApiResponse<string>
-                {
-                    Success = false,
-                    Message = "Entity not found",
-                    NotificationType = NotificationType.BadRequest
-                });
-            }
-
-            return NoContent();
+            var response = _subcategoryService.DeleteSubcategory(id);
+            return HandleResponse(response);
         }
     }
 }
