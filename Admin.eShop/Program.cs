@@ -81,11 +81,7 @@ using (var scope = app.Services.CreateScope())
         {
             var category = dbContext.Categories.Where(x => x.Name == "UNCATEGORIZED").First();
 
-            var subcategory = new Subcategory
-            {
-                Name = "UNCATEGORIZED",
-                CategoryId = category.Id,
-            };
+            var subcategory = new Subcategory(category.Id, "UNCATEGORIZED");
 
             dbContext.Subcategories.Add(subcategory);
             dbContext.SaveChanges();

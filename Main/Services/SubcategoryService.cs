@@ -109,11 +109,7 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
                     NotificationType = NotificationType.BadRequest
                 };
 
-            var entity = new Subcategory()
-            {
-                Name = request.Name,
-                CategoryId = request.CategoryId
-            };
+            var entity = new Subcategory(request.CategoryId, request.Name);
 
             _subcategoryRepository.Insert(entity);
             _uow.SaveChanges();

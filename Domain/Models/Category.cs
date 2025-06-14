@@ -12,11 +12,12 @@ public class Category : AuditableBaseEntity
 
     public Category(string name)
     {
-        SetName(name);
+        Rename(name);
     }
 
-    public void Update(string name) => SetName(name);
-    private void SetName(string name)
+    public void Update(string name) => Rename(name);
+
+    private void Rename(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainValidationException("Category name cannot be empty.");
