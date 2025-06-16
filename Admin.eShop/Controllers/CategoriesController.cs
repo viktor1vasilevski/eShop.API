@@ -1,10 +1,6 @@
 ﻿using Admin.eShop.Controllers;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Category;
-using Main.Enums;
-using Main.Responses;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eShop.Admin.Controllers;
