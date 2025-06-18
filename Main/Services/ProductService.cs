@@ -1,30 +1,143 @@
-﻿using eShop.Main.DTOs.Product;
+﻿using Domain.Interfaces;
+using Domain.Models;
+using eShop.Domain.Exceptions;
+using eShop.Main.Constants;
+using eShop.Main.DTOs.Product;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Product;
-using Main.Responses;
+using eShop.Main.Responses;
+using Infrastructure.Data.Context;
+using Main.Enums;
+using Main.Extensions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace eShop.Main.Services;
 
-public class ProductService : IProductService
+public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryService> _logger) : IProductService
 {
+    private readonly IGenericRepository<Product> _productRepository = _uow.GetGenericRepository<Product>();
+
+
     public ApiResponse<List<ProductDTO>> GetProducts(ProductRequest request)
     {
         try
         {
-            return new ApiResponse<List<ProductDTO>>
+            var products = _productRepository.GetAsQueryableWhereIf(x =>
+                x.WhereIf(!String.IsNullOrEmpty(request.CategoryId.ToString()), x => x.Subcategory.Category.Id == request.CategoryId)
+                 .WhereIf(!String.IsNullOrEmpty(request.SubcategoryId.ToString()), x => x.Subcategory.Id == request.SubcategoryId)
+                 .WhereIf(!String.IsNullOrEmpty(request.Description), x => x.Description.ToLower().Contains(request.Description.ToLower()))
+                 .WhereIf(!String.IsNullOrEmpty(request.Brand), x => x.Brand.ToLower().Contains(request.Brand.ToLower())),
+                null,
+                x => x.Include(x => x.Subcategory).ThenInclude(sc => sc.Category));
+
+            if (!string.IsNullOrEmpty(request.SortBy) && !string.IsNullOrEmpty(request.SortDirection))
+            {
+                if (request.SortDirection.ToLower() == "asc")
+                {
+                    products = request.SortBy.ToLower() switch
+                    {
+                        "created" => products.OrderBy(x => x.Created),
+                        "lastmodified" => products.OrderBy(x => x.LastModified),
+                        "unitprice" => products.OrderBy(x => x.UnitPrice),
+                        "unitquantity" => products.OrderBy(x => x.UnitQuantity),
+                        _ => products.OrderBy(x => x.Created)
+                    };
+                }
+                else if (request.SortDirection.ToLower() == "desc")
+                {
+                    products = request.SortBy.ToLower() switch
+                    {
+                        "created" => products.OrderByDescending(x => x.Created),
+                        "lastmodified" => products.OrderByDescending(x => x.LastModified),
+                        "unitprice" => products.OrderByDescending(x => x.UnitPrice),
+                        "unitquantity" => products.OrderByDescending(x => x.UnitQuantity),
+                        _ => products.OrderByDescending(x => x.Created)
+                    };
+                }
+            }
+
+            var totalCount = products.Count();
+
+            if (request.Skip.HasValue)
+                products = products.Skip(request.Skip.Value);
+
+            if (request.Take.HasValue)
+                products = products.Take(request.Take.Value);
+
+            var productsDTO = products.Select(x => new ProductDTO
+            {
+                Id = x.Id,
+                Brand = x.Brand,
+                Description = x.Description,
+                UnitPrice = x.UnitPrice,
+                UnitQuantity = x.UnitQuantity,
+                //ImageBase64 = x.Image != null ? $"data:{x.ImageType};base64,{Convert.ToBase64String(x.Image)}" : null,
+                Category = x.Subcategory.Category.Name,
+                Subcategory = x.Subcategory.Name,
+                SubcategoryId = x.SubcategoryId,
+                Created = x.Created,
+                LastModified = x.LastModified,
+            }).ToList();
+
+            return new ApiResponse<List<ProductDTO>>()
             {
                 Success = true,
-
+                Data = productsDTO,
+                TotalCount = totalCount,
+                NotificationType = NotificationType.Success
             };
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp}", nameof(GetProducts),
+                DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
-            return new ApiResponse<List<ProductDTO>>() 
-            { 
-                Success = false 
+            return new ApiResponse<List<ProductDTO>>()
+            {
+                Success = false,
+                Message = ProductConstants.ERROR_RETRIEVING_PRODUCTS,
+                NotificationType = NotificationType.ServerError
             };
         }
 
+    }
+    public ApiResponse<string> CreateProduct(CreateProductRequest request)
+    {
+        try
+        {
+            var product = new Product(request.Brand, request.Description, request.Price, request.Quantity, request.SubcategoryId);
+
+            _productRepository.Insert(product);
+            _uow.SaveChanges();
+
+            return new ApiResponse<string>
+            {
+                Success = true,
+                Message = ProductConstants.PRODUCT_SUCCESSFULLY_CREATED,
+                NotificationType = NotificationType.Created
+            };
+        }
+        catch (DomainValidationException ex)
+        {
+            return new ApiResponse<string>
+            {
+                Success = false,
+                NotificationType = NotificationType.BadRequest,
+                Message = ex.Message
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp}", nameof(CreateProduct),
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
+            return new ApiResponse<string>
+            {
+                Success = false,
+                NotificationType = NotificationType.ServerError,
+                Message = ProductConstants.ERROR_CREATING_PRODUCT
+            };
+        }
     }
 }

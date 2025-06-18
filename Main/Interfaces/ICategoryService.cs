@@ -1,6 +1,6 @@
 ﻿using eShop.Main.DTOs.Category;
 using eShop.Main.Requests.Category;
-using Main.Responses;
+using eShop.Main.Responses;
 
 namespace eShop.Main.Interfaces;
 

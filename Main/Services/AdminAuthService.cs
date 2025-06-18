@@ -1,6 +1,7 @@
 ﻿using Domain.Enums;
 using Domain.Interfaces;
 using Domain.Models;
+using eShop.Main.Responses;
 using Infrastructure.Data.Context;
 using Main.Constants;
 using Main.DTOs.Auth;
@@ -8,7 +9,6 @@ using Main.Enums;
 using Main.Helpers;
 using Main.Interfaces;
 using Main.Requests.Auth;
-using Main.Responses;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;

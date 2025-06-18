@@ -1,99 +1,93 @@
 ﻿using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Infrastructure.Data.Repositories
+namespace Infrastructure.Data.Repositories;
+
+public class SqlUnitOfWork<TContext> : IDisposable, IUnitOfWork<TContext> where TContext : DbContext, new()
 {
-    public class SqlUnitOfWork<TContext> : IDisposable, IUnitOfWork<TContext> where TContext : DbContext, new()
+    private TContext _context;
+    private bool disposed = false;
+
+    public SqlUnitOfWork(TContext context)
     {
-        private TContext _context;
-        private bool disposed = false;
+        _context = context;
+    }
 
-        public SqlUnitOfWork(TContext context)
+    public void DetachAllEntities()
+    {
+        var entities = _context.ChangeTracker.Entries();
+        foreach (var entry in entities)
         {
-            _context = context;
+            entry.State = EntityState.Detached;
         }
+    }
 
-        public void DetachAllEntities()
-        {
-            var entities = _context.ChangeTracker.Entries();
-            foreach (var entry in entities)
-            {
-                entry.State = EntityState.Detached;
-            }
-        }
+    public void Dispose()
+    {
+        _context.Dispose();
+    }
 
-        public void Dispose()
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposed)
         {
-            _context.Dispose();
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    _context.Dispose();
-                }
-            }
-            this.disposed = true;
-        }
-
-        public IGenericRepository<TEntity> GetGenericRepository<TEntity>() where TEntity : class
-        {
-            return new SqlGenericRepository<TEntity, TContext>(_context);
-        }
-
-        public void Restart()
-        {
-            if (_context != null)
+            if (disposing)
             {
                 _context.Dispose();
             }
-            _context = new TContext();
         }
+        this.disposed = true;
+    }
 
-        public TContext ReturnContext() => _context;
+    public IGenericRepository<TEntity> GetGenericRepository<TEntity>() where TEntity : class
+    {
+        return new SqlGenericRepository<TEntity, TContext>(_context);
+    }
 
-        public void RevertChanges()
+    public void Restart()
+    {
+        if (_context != null)
         {
-            foreach (var entry in _context.ChangeTracker.Entries())
+            _context.Dispose();
+        }
+        _context = new TContext();
+    }
+
+    public TContext ReturnContext() => _context;
+
+    public void RevertChanges()
+    {
+        foreach (var entry in _context.ChangeTracker.Entries())
+        {
+            switch (entry.State)
             {
-                switch (entry.State)
-                {
-                    case EntityState.Modified:
-                        {
-                            entry.CurrentValues.SetValues(entry.OriginalValues);
-                            entry.State = EntityState.Unchanged;
-                            break;
-                        }
-                    case EntityState.Deleted:
-                        {
-                            entry.State = EntityState.Unchanged;
-                            break;
-                        }
-                    case EntityState.Added:
-                        {
-                            entry.State = EntityState.Detached;
-                            break;
-                        }
-                }
+                case EntityState.Modified:
+                    {
+                        entry.CurrentValues.SetValues(entry.OriginalValues);
+                        entry.State = EntityState.Unchanged;
+                        break;
+                    }
+                case EntityState.Deleted:
+                    {
+                        entry.State = EntityState.Unchanged;
+                        break;
+                    }
+                case EntityState.Added:
+                    {
+                        entry.State = EntityState.Detached;
+                        break;
+                    }
             }
         }
+    }
 
-        public void SaveChanges()
-        {
-            _context.SaveChanges();
-        }
+    public void SaveChanges()
+    {
+        _context.SaveChanges();
+    }
 
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
+    public async Task SaveChangesAsync()
+    {
+        await _context.SaveChangesAsync();
     }
 }

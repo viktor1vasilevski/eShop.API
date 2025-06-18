@@ -5,10 +5,10 @@ using eShop.Main.Constants;
 using eShop.Main.DTOs.Category;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Category;
+using eShop.Main.Responses;
 using Infrastructure.Data.Context;
 using Main.Enums;
 using Main.Extensions;
-using Main.Responses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

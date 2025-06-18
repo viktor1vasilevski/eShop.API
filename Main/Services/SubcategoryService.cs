@@ -7,10 +7,10 @@ using eShop.Main.DTOs.Subcategory;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Category;
 using eShop.Main.Requests.Subcategory;
+using eShop.Main.Responses;
 using Infrastructure.Data.Context;
 using Main.Enums;
 using Main.Extensions;
-using Main.Responses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -296,6 +296,48 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
                 Success = false,
                 NotificationType = NotificationType.ServerError,
                 Message = CategoryConstants.ERROR_EDITING_CATEGORY
+            };
+        }
+    }
+    public ApiResponse<List<SelectSubcategoryListItemDTO>> GetSubcategoriesDropdownList()
+    {
+        try
+        {
+            var uncategorizedCategoryId = _categoryRepository
+                .Get(x => x.Name == "UNCATEGORIZED")
+                .Select(x => x.Id)
+                .FirstOrDefault();
+
+            var uncategorizedSubcategoryId = _subcategoryRepository
+                .Get(x => x.Name == "UNCATEGORIZED" && x.CategoryId == uncategorizedCategoryId)
+                .Select(x => x.Id)
+                .FirstOrDefault();
+
+            var subcategoriesDropdownDTO = _subcategoryRepository
+                .Get(x => x.CategoryId != uncategorizedCategoryId || x.Id == uncategorizedSubcategoryId, null, x => x.Include(x => x.Category))
+                .Select(x => new SelectSubcategoryListItemDTO
+                {
+                    Id = x.Id,
+                    Name = $"{x.Name} ({x.Category.Name})"
+                })
+                .ToList();
+
+            return new ApiResponse<List<SelectSubcategoryListItemDTO>>
+            {
+                Success = true,
+                Data = subcategoriesDropdownDTO
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting subcategories for dropdown list at {Timestamp}",
+                DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
+
+            return new ApiResponse<List<SelectSubcategoryListItemDTO>>
+            {
+                Success = false,
+                Message = SubcategoryConstants.ERROR_RETRIEVING_SUBCATEGORIES,
+                NotificationType = NotificationType.ServerError
             };
         }
     }

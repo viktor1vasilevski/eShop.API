@@ -1,6 +1,6 @@
-﻿using Main.DTOs.Auth;
+﻿using eShop.Main.Responses;
+using Main.DTOs.Auth;
 using Main.Requests.Auth;
-using Main.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
