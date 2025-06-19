@@ -1,12 +1,13 @@
 ﻿using Admin.eShop.Controllers;
 using eShop.Main.Interfaces;
-using eShop.Main.Requests.Category;
 using eShop.Main.Requests.Product;
-using eShop.Main.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eShop.Admin.Controllers;
 
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 [Route("api/[controller]")]
 [ApiController]
 public class ProductController(IProductService productService) : BaseController
