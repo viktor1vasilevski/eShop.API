@@ -149,4 +149,41 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
             };
         }
     }
+
+    public ApiResponse<string> DeleteProduct(Guid id)
+    {
+        try
+        {
+            var product = _productRepository.GetById(id);
+            if (product is null)
+                return new ApiResponse<string>
+                {
+                    Success = false,
+                    NotificationType = NotificationType.NotFound,
+                    Message = ProductConstants.PRODUCT_DOESNT_EXIST
+                };
+
+            _productRepository.Delete(product);
+            _uow.SaveChanges();
+
+            return new ApiResponse<string>
+            {
+                Success = true,
+                Message = ProductConstants.PRODUCT_SUCCESSFULLY_DELETED,
+                NotificationType = NotificationType.Success
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp} : ProductId: {ProductId}",
+                        nameof(DeleteProduct), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), id);
+
+            return new ApiResponse<string>
+            {
+                Success = false,
+                Message = ProductConstants.ERROR_DELETING_PRODUCT,
+                NotificationType = NotificationType.ServerError
+            };
+        }
+    }
 }

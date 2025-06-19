@@ -26,4 +26,11 @@ public class ProductController(IProductService productService) : BaseController
         var response = _productService.CreateProduct(request);
         return HandleResponse(response);
     }
+
+    [HttpDelete("{id}")]
+    public IActionResult Delete([FromRoute] Guid id)
+    {
+        var response = _productService.DeleteProduct(id);
+        return HandleResponse(response);
+    }
 }
