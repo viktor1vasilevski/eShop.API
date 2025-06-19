@@ -17,6 +17,7 @@ namespace eShop.Main.Services;
 public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryService> _logger) : IProductService
 {
     private readonly IGenericRepository<Product> _productRepository = _uow.GetGenericRepository<Product>();
+    private readonly IGenericRepository<Subcategory> _subcategoryRepository = _uow.GetGenericRepository<Subcategory>();
 
 
     public ApiResponse<List<ProductDTO>> GetProducts(ProductRequest request)
@@ -106,6 +107,14 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
     {
         try
         {
+            if (!_subcategoryRepository.Exists(x => x.Id == request.SubcategoryId))
+                return new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = SubcategoryConstants.SUBCATEGORY_DOESNT_EXIST,
+                    NotificationType = NotificationType.NotFound
+                };
+
             var product = new Product(request.Brand, request.Description, request.Price, request.Quantity, request.SubcategoryId);
 
             _productRepository.Insert(product);
