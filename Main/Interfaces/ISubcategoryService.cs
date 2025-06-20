@@ -12,5 +12,6 @@ public interface ISubcategoryService
     ApiResponse<CategoryDTO> EditSubcategory(Guid id, EditSubcategoryRequest request);
     ApiResponse<SubcategoryDTO> GetSubcategoryById(Guid id);
     ApiResponse<string> DeleteSubcategory(Guid id);
+    ApiResponse<List<SelectSubcategoryListItemDTO>> GetSubcategoriesWithCategoriesDropdownList();
     ApiResponse<List<SelectSubcategoryListItemDTO>> GetSubcategoriesDropdownList();
 }

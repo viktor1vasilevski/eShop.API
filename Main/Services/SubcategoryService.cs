@@ -256,7 +256,15 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
                     Message = SubcategoryConstants.SUBCATEGORY_DOESNT_EXIST
                 };
 
-            if (_subcategoryRepository.Exists(x => string.Equals(x.Name, request.Name, StringComparison.OrdinalIgnoreCase) && x.Id != id))
+            if (!_categoryRepository.Exists(x => x.Id == request.CategoryId))
+                return new ApiResponse<CategoryDTO>
+                {
+                    Success = false,
+                    NotificationType = NotificationType.NotFound,
+                    Message = CategoryConstants.CATEGORY_DOESNT_EXIST,
+                };
+
+            if (_subcategoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower() && x.Id != id))
                 return new ApiResponse<CategoryDTO>
                 {
                     Success = false,
@@ -299,7 +307,7 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
             };
         }
     }
-    public ApiResponse<List<SelectSubcategoryListItemDTO>> GetSubcategoriesDropdownList()
+    public ApiResponse<List<SelectSubcategoryListItemDTO>> GetSubcategoriesWithCategoriesDropdownList()
     {
         try
         {
@@ -337,6 +345,38 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
             {
                 Success = false,
                 Message = SubcategoryConstants.ERROR_RETRIEVING_SUBCATEGORIES,
+                NotificationType = NotificationType.ServerError
+            };
+        }
+    }
+
+    public ApiResponse<List<SelectSubcategoryListItemDTO>> GetSubcategoriesDropdownList()
+    {
+        try
+        {
+            var subcategories = _subcategoryRepository.GetAsQueryable();
+
+            var subcategoriesDropdownDTO = subcategories.Select(x => new SelectSubcategoryListItemDTO
+            {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList();
+
+            return new ApiResponse<List<SelectSubcategoryListItemDTO>>
+            {
+                Success = true,
+                Data = subcategoriesDropdownDTO
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp}", nameof(GetSubcategoriesDropdownList),
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
+            return new ApiResponse<List<SelectSubcategoryListItemDTO>>
+            {
+                Success = false,
+                Message = CategoryConstants.ERROR_RETRIEVING_CATEGORIES,
                 NotificationType = NotificationType.ServerError
             };
         }

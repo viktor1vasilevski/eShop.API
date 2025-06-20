@@ -59,4 +59,12 @@ public class SubcategoryController(ISubcategoryService subcategoryService) : Bas
         return HandleResponse(response);
 
     }
+
+    [HttpGet("DropdownListWithCategories")]
+    public IActionResult GetSubcategoriesWithCategoriesDropdownList()
+    {
+        var response = _subcategoryService.GetSubcategoriesWithCategoriesDropdownList();
+        return HandleResponse(response);
+
+    }
 }
