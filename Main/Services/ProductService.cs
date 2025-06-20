@@ -149,7 +149,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
             };
         }
     }
-
     public ApiResponse<string> DeleteProduct(Guid id)
     {
         try
@@ -183,6 +182,56 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
                 Success = false,
                 Message = ProductConstants.ERROR_DELETING_PRODUCT,
                 NotificationType = NotificationType.ServerError
+            };
+        }
+    }
+    public ApiResponse<ProductDTO> GetProductById(Guid id)
+    {
+        try
+        {
+            var product = _productRepository.Get(
+                filter: x => x.Id == id,
+                include: x => x.Include(x => x.Subcategory).ThenInclude(x => x.Category)).FirstOrDefault();
+
+            if (product is null)
+                return new ApiResponse<ProductDTO>
+                {
+                    Success = false,
+                    NotificationType = NotificationType.NotFound,
+                    Message = ProductConstants.PRODUCT_DOESNT_EXIST
+                };
+
+            var productDto = new ProductDTO()
+            {
+                Id = product.Id,
+                Brand = product.Brand,
+                Description = product.Description,
+                UnitPrice = product.UnitPrice,
+                UnitQuantity = product.UnitQuantity,
+                Subcategory = product.Subcategory?.Name,
+                Category = product.Subcategory?.Category?.Name,
+                LastModified = product.LastModified,
+                Created = product.Created    
+            };
+
+
+            return new ApiResponse<ProductDTO>
+            {
+                Success = true,
+                NotificationType = NotificationType.Success,
+                Data = productDto
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp}", nameof(GetProductById),
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
+            return new ApiResponse<ProductDTO>
+            {
+                Success = false,
+                NotificationType = NotificationType.ServerError,
+                Message = ProductConstants.ERROR_GET_PRODUCT
             };
         }
     }

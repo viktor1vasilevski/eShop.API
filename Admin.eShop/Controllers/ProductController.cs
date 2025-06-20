@@ -1,6 +1,7 @@
 ﻿using Admin.eShop.Controllers;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Product;
+using eShop.Main.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,13 @@ public class ProductController(IProductService productService) : BaseController
     public IActionResult Get([FromQuery] ProductRequest request)
     {
         var response = _productService.GetProducts(request);
+        return HandleResponse(response);
+    }
+
+    [HttpGet("{id}")]
+    public IActionResult GetById([FromRoute] Guid id)
+    {
+        var response = _productService.GetProductById(id);
         return HandleResponse(response);
     }
 
