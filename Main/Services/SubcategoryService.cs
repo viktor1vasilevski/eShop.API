@@ -100,6 +100,7 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
         {
             var entity = new Subcategory(request.CategoryId, request.Name);
             _subcategoryRepository.Insert(entity);
+            _uow.SaveChanges();
         }
         catch (DomainValidationException ex)
         {
@@ -110,8 +111,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
                 Message = ex.Message
             };
         }
-
-        _uow.SaveChanges();
 
         return new ApiResponse<string>
         {
@@ -219,6 +218,7 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
         {
             subcategory.Update(request.CategoryId, request.Name);
             _subcategoryRepository.Update(subcategory);
+            _uow.SaveChanges();
         }
         catch (DomainValidationException ex)
         {
@@ -229,8 +229,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
                 Message = ex.Message
             };
         }
-
-        _uow.SaveChanges();
 
         return new ApiResponse<CategoryDTO>
         {

@@ -102,6 +102,7 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
         {
             var product = new Product(request.Brand, request.Description, request.Price, request.Quantity, request.SubcategoryId);
             _productRepository.Insert(product);
+            _uow.SaveChanges();
         }
         catch (DomainValidationException ex)
         {
@@ -112,9 +113,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
                 Message = ex.Message
             };
         }
-
-
-        _uow.SaveChanges();
 
         return new ApiResponse<string>
         {
@@ -210,6 +208,7 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
         {
             product.Update(request.Brand, request.Description, request.Price, request.Quantity, request.SubcategoryId);
             _productRepository.Update(product);
+            _uow.SaveChanges();
         }
         catch (DomainValidationException ex)
         {
@@ -220,9 +219,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
                 Message = ex.Message
             };
         }
-
-
-        _uow.SaveChanges();
 
         return new ApiResponse<ProductDTO>
         {

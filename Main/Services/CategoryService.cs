@@ -84,6 +84,7 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         {
             var category = new Category(request.Name);
             _categoryRepository.Insert(category);
+            _uow.SaveChanges();
         }
         catch (DomainValidationException ex)
         {
@@ -94,8 +95,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
                 Message = ex.Message
             };
         }
-
-        _uow.SaveChanges();
 
         return new ApiResponse<string>
         {
@@ -128,6 +127,7 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         {
             category.Update(request.Name);
             _categoryRepository.Update(category);
+            _uow.SaveChanges();
         }
         catch (DomainValidationException ex)
         {
@@ -138,8 +138,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
                 Message = ex.Message
             };
         }
-
-        _uow.SaveChanges();
 
         return new ApiResponse<CategoryDTO>
         {
