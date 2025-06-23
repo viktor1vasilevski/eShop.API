@@ -1,12 +1,12 @@
 ﻿using Domain.Enums;
 using Domain.Interfaces;
 using Domain.Models;
+using eShop.Main.Helpers;
 using eShop.Main.Responses;
 using Infrastructure.Data.Context;
 using Main.Constants;
 using Main.DTOs.Auth;
 using Main.Enums;
-using Main.Helpers;
 using Main.Interfaces;
 using Main.Requests.Auth;
 using Microsoft.Extensions.Configuration;
