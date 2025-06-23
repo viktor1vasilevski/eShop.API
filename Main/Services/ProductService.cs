@@ -26,7 +26,7 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
                 x.WhereIf(!String.IsNullOrEmpty(request.CategoryId.ToString()), x => x.Subcategory.Category.Id == request.CategoryId)
                  .WhereIf(!String.IsNullOrEmpty(request.SubcategoryId.ToString()), x => x.Subcategory.Id == request.SubcategoryId)
                  .WhereIf(!String.IsNullOrEmpty(request.Description), x => x.Description.ToLower().Contains(request.Description.ToLower()))
-                 .WhereIf(!String.IsNullOrEmpty(request.Brand), x => x.Brand.ToLower().Contains(request.Brand.ToLower())),
+                 .WhereIf(!String.IsNullOrEmpty(request.Name), x => x.Name.ToLower().Contains(request.Name.ToLower())),
                 null,
                 x => x.Include(x => x.Subcategory).ThenInclude(sc => sc.Category));
 
@@ -67,7 +67,7 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
         var productsDTO = products.Select(x => new ProductDTO
         {
             Id = x.Id,
-            Brand = x.Brand,
+            Name = x.Name,
             Description = x.Description,
             UnitPrice = x.UnitPrice,
             UnitQuantity = x.UnitQuantity,
@@ -161,7 +161,7 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
         var productDto = new ProductDTO()
         {
             Id = product.Id,
-            Brand = product.Brand,
+            Name = product.Name,
             Description = product.Description,
             UnitPrice = product.UnitPrice,
             UnitQuantity = product.UnitQuantity,
