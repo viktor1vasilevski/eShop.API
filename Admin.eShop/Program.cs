@@ -1,17 +1,18 @@
 using Domain.Enums;
 using Domain.Interfaces;
 using Domain.Models;
-using Infrastructure.Data.Context;
-using Infrastructure.Data.Repositories;
-using Main.Helpers;
-using Microsoft.EntityFrameworkCore;
-using Infrastructure.IoC;
+using eShop.Admin.Middlewares;
+using eShop.Main.Validations.Category;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure.Data.Context;
+using Infrastructure.Data.Repositories;
+using Infrastructure.IoC;
+using Main.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using eShop.Main.Validations.Category;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -157,6 +158,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("MyPolicy");
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseAuthorization();
 
