@@ -2,6 +2,7 @@
 using Domain.Models;
 using eShop.Domain.Exceptions;
 using eShop.Main.Constants;
+using eShop.Main.DTOs.Category;
 using eShop.Main.DTOs.Product;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Product;
@@ -187,12 +188,46 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
     }
     public ApiResponse<ProductDTO> GetProductById(Guid id)
     {
-        try
-        {
-            var product = _productRepository.Get(
+        var product = _productRepository.Get(
                 filter: x => x.Id == id,
                 include: x => x.Include(x => x.Subcategory).ThenInclude(x => x.Category)).FirstOrDefault();
 
+        if (product is null)
+            return new ApiResponse<ProductDTO>
+            {
+                Success = false,
+                NotificationType = NotificationType.NotFound,
+                Message = ProductConstants.PRODUCT_DOESNT_EXIST
+            };
+
+        var productDto = new ProductDTO()
+        {
+            Id = product.Id,
+            Brand = product.Brand,
+            Description = product.Description,
+            UnitPrice = product.UnitPrice,
+            UnitQuantity = product.UnitQuantity,
+            SubcategoryId = product.SubcategoryId,
+            Subcategory = product.Subcategory?.Name,
+            Category = product.Subcategory?.Category?.Name,
+            LastModified = product.LastModified,
+            Created = product.Created
+        };
+
+
+        return new ApiResponse<ProductDTO>
+        {
+            Success = true,
+            NotificationType = NotificationType.Success,
+            Data = productDto
+        };
+    }
+
+    public ApiResponse<ProductDTO> EditProduct(Guid id, EditProductRequest request)
+    {
+        try
+        {
+            var product = _productRepository.GetById(id);
             if (product is null)
                 return new ApiResponse<ProductDTO>
                 {
@@ -201,37 +236,38 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
                     Message = ProductConstants.PRODUCT_DOESNT_EXIST
                 };
 
-            var productDto = new ProductDTO()
-            {
-                Id = product.Id,
-                Brand = product.Brand,
-                Description = product.Description,
-                UnitPrice = product.UnitPrice,
-                UnitQuantity = product.UnitQuantity,
-                Subcategory = product.Subcategory?.Name,
-                Category = product.Subcategory?.Category?.Name,
-                LastModified = product.LastModified,
-                Created = product.Created    
-            };
+            if (!_subcategoryRepository.Exists(x => x.Id == request.SubcategoryId))
+                return new ApiResponse<ProductDTO>
+                {
+                    Success = false,
+                    NotificationType = NotificationType.NotFound,
+                    Message = SubcategoryConstants.SUBCATEGORY_DOESNT_EXIST,
+                };
 
+            // HERE WE WOULD HAVE A CHECK IF THE SAME PRODUCT WITH
+            // THE SAME NAME ALREADY EXIST, BUT FOR NOW I DONT HAVE 
+            // PRODUCT NAME
+
+            product.Update(request.Brand, request.Description, request.Price, request.Quantity, request.SubcategoryId);
+
+            _productRepository.Update(product);
+            _uow.SaveChanges();
 
             return new ApiResponse<ProductDTO>
             {
                 Success = true,
                 NotificationType = NotificationType.Success,
-                Data = productDto
+                Message = SubcategoryConstants.SUBCATEGORY_SUCCESSFULLY_EDITED,
+                //Data = new CategoryDTO { Id = id, Name = request.Name }
             };
         }
-        catch (Exception ex)
+        catch (DomainValidationException ex)
         {
-            _logger.LogError(ex, "An exception occurred in {FunctionName} at {Timestamp}", nameof(GetProductById),
-                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-
             return new ApiResponse<ProductDTO>
             {
                 Success = false,
-                NotificationType = NotificationType.ServerError,
-                Message = ProductConstants.ERROR_GET_PRODUCT
+                NotificationType = NotificationType.BadRequest,
+                Message = ex.Message
             };
         }
     }

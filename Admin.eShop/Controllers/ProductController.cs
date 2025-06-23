@@ -1,7 +1,6 @@
 ﻿using Admin.eShop.Controllers;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Product;
-using eShop.Main.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +32,13 @@ public class ProductController(IProductService productService) : BaseController
     public IActionResult Create([FromBody] CreateProductRequest request)
     {
         var response = _productService.CreateProduct(request);
+        return HandleResponse(response);
+    }
+
+    [HttpPut("{id}")]
+    public IActionResult Edit([FromRoute] Guid id, [FromBody] EditProductRequest request)
+    {
+        var response = _productService.EditProduct(id, request);
         return HandleResponse(response);
     }
 
