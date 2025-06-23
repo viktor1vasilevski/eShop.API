@@ -70,10 +70,10 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         };
     }
 
-    public ApiResponse<string> CreateCategory(CreateCategoryRequest request)
+    public ApiResponse<CategoryDTO> CreateCategory(CreateCategoryRequest request)
     {
         if (_categoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower()))
-            return new ApiResponse<string>()
+            return new ApiResponse<CategoryDTO>()
             {
                 Success = false,
                 Message = CategoryConstants.CATEGORY_EXISTS,
@@ -83,25 +83,26 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         try
         {
             var category = new Category(request.Name);
-            _categoryRepository.Insert(category);
+            var createdCategory = _categoryRepository.Insert(category);
             _uow.SaveChanges();
+
+            return new ApiResponse<CategoryDTO>
+            {
+                Success = true,
+                NotificationType = NotificationType.Created,
+                Message = CategoryConstants.CATEGORY_SUCCESSFULLY_CREATED,
+                Data = new CategoryDTO { Id = createdCategory.Id, Name = createdCategory.Name, Created = createdCategory.Created }
+            };
         }
         catch (DomainValidationException ex)
         {
-            return new ApiResponse<string>
+            return new ApiResponse<CategoryDTO>
             {
                 Success = false,
                 NotificationType = NotificationType.BadRequest,
                 Message = ex.Message
             };
         }
-
-        return new ApiResponse<string>
-        {
-            Success = true,
-            NotificationType = NotificationType.Created,
-            Message = CategoryConstants.CATEGORY_SUCCESSFULLY_CREATED
-        };
     }
 
     public ApiResponse<CategoryDTO> EditCategory(Guid id, EditCategoryRequest request)

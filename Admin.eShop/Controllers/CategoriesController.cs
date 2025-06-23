@@ -25,6 +25,10 @@ public class CategoryController(ICategoryService categoryService) : BaseControll
     public IActionResult Create([FromBody] CreateCategoryRequest request)
     {
         var response = _categoryService.CreateCategory(request);
+
+        var locationUri = Url.Action("GetById", "Category", new { id = response.Data?.Id }, Request.Scheme);
+        response.Location = locationUri;
+
         return HandleResponse(response);
     }
 
