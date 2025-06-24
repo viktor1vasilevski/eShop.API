@@ -78,10 +78,10 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
         };
     }
 
-    public ApiResponse<string> CreateSubcategory(CreateSubcategoryRequest request)
+    public ApiResponse<SubcategoryDTO> CreateSubcategory(CreateSubcategoryRequest request)
     {
         if (_subcategoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower()))
-            return new ApiResponse<string>()
+            return new ApiResponse<SubcategoryDTO>()
             {
                 Success = false,
                 Message = SubcategoryConstants.SUBCATEGORY_EXISTS,
@@ -89,7 +89,7 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
             };
 
         if (!_categoryRepository.Exists(x => x.Id == request.CategoryId))
-            return new ApiResponse<string>()
+            return new ApiResponse<SubcategoryDTO>()
             {
                 Success = false,
                 Message = CategoryConstants.CATEGORY_DOESNT_EXIST,
@@ -98,26 +98,33 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
 
         try
         {
-            var entity = new Subcategory(request.CategoryId, request.Name);
-            _subcategoryRepository.Insert(entity);
+            var subcategory = new Subcategory(request.CategoryId, request.Name);
+            _subcategoryRepository.Insert(subcategory);
             _uow.SaveChanges();
+
+            return new ApiResponse<SubcategoryDTO>
+            {
+                Success = true,
+                NotificationType = NotificationType.Created,
+                Message = SubcategoryConstants.SUBCATEGORY_SUCCESSFULLY_CREATED,
+                Data = new SubcategoryDTO
+                {
+                    Id = subcategory.Id,
+                    Name = subcategory.Name,
+                    CategoryId = subcategory.CategoryId,
+                    Created = subcategory.Created
+                }
+            };
         }
         catch (DomainValidationException ex)
         {
-            return new ApiResponse<string>
+            return new ApiResponse<SubcategoryDTO>
             {
                 Success = false,
                 NotificationType = NotificationType.BadRequest,
                 Message = ex.Message
             };
         }
-
-        return new ApiResponse<string>
-        {
-            Success = true,
-            NotificationType = NotificationType.Created,
-            Message = SubcategoryConstants.SUBCATEGORY_SUCCESSFULLY_CREATED
-        };
     }
 
     public ApiResponse<SubcategoryDTO> GetSubcategoryById(Guid id)

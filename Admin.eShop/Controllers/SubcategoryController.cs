@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eShop.Admin.Controllers;
 
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 [Route("api/[controller]")]
 [ApiController]
 public class SubcategoryController(ISubcategoryService subcategoryService) : BaseController
@@ -33,6 +33,11 @@ public class SubcategoryController(ISubcategoryService subcategoryService) : Bas
     public IActionResult Create([FromBody] CreateSubcategoryRequest request)
     {
         var response = _subcategoryService.CreateSubcategory(request);
+        if (response.Success && response.Data?.Id != null)
+        {
+            var locationUri = Url.Action(nameof(GetById), "Subcategory", new { id = response.Data.Id }, Request.Scheme);
+            response.Location = locationUri;
+        }
         return HandleResponse(response);
     }
 

@@ -1,8 +1,7 @@
 ﻿namespace eShop.Main.Requests.Subcategory;
-#nullable disable
 
 public class CreateSubcategoryRequest
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public Guid CategoryId { get; set; }
 }

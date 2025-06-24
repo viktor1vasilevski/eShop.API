@@ -25,7 +25,6 @@ public class Category : AuditableBaseEntity
         if (name.Length < 3)
             throw new DomainValidationException("Category name must be at least 3 characters long.");
 
-        Id = Guid.NewGuid();
         Name = name;
     }
 }

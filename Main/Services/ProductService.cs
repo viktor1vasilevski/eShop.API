@@ -88,10 +88,10 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
         };
     }
 
-    public ApiResponse<string> CreateProduct(CreateProductRequest request)
+    public ApiResponse<ProductDTO> CreateProduct(CreateProductRequest request)
     {
         if (!_subcategoryRepository.Exists(x => x.Id == request.SubcategoryId))
-            return new ApiResponse<string>
+            return new ApiResponse<ProductDTO>
             {
                 Success = false,
                 Message = SubcategoryConstants.SUBCATEGORY_DOESNT_EXIST,
@@ -100,26 +100,36 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
 
         try
         {
-            var product = new Product(request.Brand, request.Description, request.Price, request.Quantity, request.SubcategoryId);
+            var product = new Product(request.Name, request.Description, request.Price, request.Quantity, request.SubcategoryId);
             _productRepository.Insert(product);
             _uow.SaveChanges();
+
+            return new ApiResponse<ProductDTO>
+            {
+                Success = true,
+                Message = ProductConstants.PRODUCT_SUCCESSFULLY_CREATED,
+                NotificationType = NotificationType.Created,
+                Data = new ProductDTO
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    UnitPrice = product.UnitPrice,
+                    UnitQuantity = product.UnitQuantity,
+                    SubcategoryId = product.SubcategoryId,
+                    Created = product.Created,
+                }
+            };
         }
         catch (DomainValidationException ex)
         {
-            return new ApiResponse<string>
+            return new ApiResponse<ProductDTO>
             {
                 Success = false,
                 NotificationType = NotificationType.BadRequest,
                 Message = ex.Message
             };
         }
-
-        return new ApiResponse<string>
-        {
-            Success = true,
-            Message = ProductConstants.PRODUCT_SUCCESSFULLY_CREATED,
-            NotificationType = NotificationType.Created
-        };
     }
 
     public ApiResponse<string> DeleteProduct(Guid id)
