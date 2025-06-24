@@ -129,6 +129,14 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
             category.Update(request.Name);
             _categoryRepository.Update(category);
             _uow.SaveChanges();
+
+            return new ApiResponse<CategoryDTO>
+            {
+                Success = true,
+                NotificationType = NotificationType.Success,
+                Message = CategoryConstants.CATEGORY_SUCCESSFULLY_UPDATE,
+                Data = new CategoryDTO { Id = id, Name = category.Name }
+            };
         }
         catch (DomainValidationException ex)
         {
@@ -139,14 +147,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
                 Message = ex.Message
             };
         }
-
-        return new ApiResponse<CategoryDTO>
-        {
-            Success = true,
-            NotificationType = NotificationType.Success,
-            Message = CategoryConstants.CATEGORY_SUCCESSFULLY_UPDATE,
-            Data = new CategoryDTO { Id = id, Name = request.Name }
-        };
     }
 
     public ApiResponse<CategoryDetailsDTO> GetCategoryById(Guid id)

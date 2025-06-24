@@ -202,6 +202,14 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
                 Message = ProductConstants.PRODUCT_DOESNT_EXIST
             };
 
+        if (_productRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower() && x.Id != id))
+            return new ApiResponse<ProductDTO>
+            {
+                Success = false,
+                NotificationType = NotificationType.Conflict,
+                Message = ProductConstants.PRODUCT_EXISTS
+            };
+
         if (!_subcategoryRepository.Exists(x => x.Id == request.SubcategoryId))
             return new ApiResponse<ProductDTO>
             {
@@ -210,15 +218,19 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
                 Message = SubcategoryConstants.SUBCATEGORY_DOESNT_EXIST,
             };
 
-        // HERE WE WOULD HAVE A CHECK IF THE SAME PRODUCT WITH
-        // THE SAME NAME ALREADY EXIST, BUT FOR NOW I DONT HAVE 
-        // PRODUCT NAME
-
         try
         {
-            product.Update(request.Brand, request.Description, request.Price, request.Quantity, request.SubcategoryId);
+            product.Update(request.Name, request.Description, request.Price, request.Quantity, request.SubcategoryId);
             _productRepository.Update(product);
             _uow.SaveChanges();
+
+            return new ApiResponse<ProductDTO>
+            {
+                Success = true,
+                NotificationType = NotificationType.Success,
+                Message = ProductConstants.PRODUCT_SUCCESSFULLY_UPDATED,
+                //Data = new CategoryDTO { Id = id, Name = request.Name }
+            };
         }
         catch (DomainValidationException ex)
         {
@@ -230,12 +242,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
             };
         }
 
-        return new ApiResponse<ProductDTO>
-        {
-            Success = true,
-            NotificationType = NotificationType.Success,
-            Message = SubcategoryConstants.SUBCATEGORY_SUCCESSFULLY_EDITED,
-            //Data = new CategoryDTO { Id = id, Name = request.Name }
-        };
+
     }
 }

@@ -7,9 +7,9 @@ public class EditProductRequestValidator : AbstractValidator<EditProductRequest>
 {
     public EditProductRequestValidator()
     {
-        RuleFor(x => x.Brand)
-            .NotEmpty().WithMessage("Brand is required.")
-            .MaximumLength(50).WithMessage("Brand name cannot exceed 50 characters.");
+        RuleFor(x => x.Name)
+            .NotEmpty().WithMessage("Product name is required.")
+            .MaximumLength(50).WithMessage("Product name cannot exceed 50 characters.");
 
         RuleFor(x => x.Description)
             .NotEmpty().WithMessage("Description is required.")

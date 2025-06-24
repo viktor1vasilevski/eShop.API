@@ -226,6 +226,14 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
             subcategory.Update(request.CategoryId, request.Name);
             _subcategoryRepository.Update(subcategory);
             _uow.SaveChanges();
+
+            return new ApiResponse<CategoryDTO>
+            {
+                Success = true,
+                NotificationType = NotificationType.Success,
+                Message = SubcategoryConstants.SUBCATEGORY_SUCCESSFULLY_EDITED,
+                Data = new CategoryDTO { Id = id, Name = subcategory.Name }
+            };
         }
         catch (DomainValidationException ex)
         {
@@ -236,14 +244,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
                 Message = ex.Message
             };
         }
-
-        return new ApiResponse<CategoryDTO>
-        {
-            Success = true,
-            NotificationType = NotificationType.Success,
-            Message = SubcategoryConstants.SUBCATEGORY_SUCCESSFULLY_EDITED,
-            Data = new CategoryDTO { Id = id, Name = request.Name }
-        };
     }
 
     public ApiResponse<List<SelectSubcategoryListItemDTO>> GetSubcategoriesWithCategoriesDropdownList()

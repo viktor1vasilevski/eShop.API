@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eShop.Admin.Controllers;
 
-//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 [Route("api/[controller]")]
 [ApiController]
 public class ProductController(IProductService productService) : BaseController
