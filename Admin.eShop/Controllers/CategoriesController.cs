@@ -1,6 +1,7 @@
 ﻿using Admin.eShop.Controllers;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Category;
+using Main.Enums;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,7 @@ public class CategoryController(ICategoryService categoryService) : BaseControll
     public IActionResult Create([FromBody] CreateCategoryRequest request)
     {
         var response = _categoryService.CreateCategory(request);
-        if (response.Success && response.Data?.Id != null)
+        if (response.Success && response.NotificationType == NotificationType.Created && response.Data?.Id != null)
         {
             var locationUri = Url.Action(nameof(GetById), "Category", new { id = response.Data.Id }, Request.Scheme);
             response.Location = locationUri;
