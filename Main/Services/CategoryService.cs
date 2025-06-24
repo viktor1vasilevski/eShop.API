@@ -83,7 +83,7 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         try
         {
             var category = new Category(request.Name);
-            var createdCategory = _categoryRepository.Insert(category);
+            _categoryRepository.Insert(category);
             _uow.SaveChanges();
 
             return new ApiResponse<CategoryDTO>
@@ -91,7 +91,7 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
                 Success = true,
                 NotificationType = NotificationType.Created,
                 Message = CategoryConstants.CATEGORY_SUCCESSFULLY_CREATED,
-                Data = new CategoryDTO { Id = createdCategory.Id, Name = createdCategory.Name, Created = createdCategory.Created }
+                Data = new CategoryDTO { Id = category.Id, Name = category.Name, Created = category.Created }
             };
         }
         catch (DomainValidationException ex)
