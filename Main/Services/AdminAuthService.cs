@@ -1,6 +1,6 @@
-﻿using Domain.Enums;
-using Domain.Interfaces;
+﻿using Domain.Interfaces;
 using Domain.Models;
+using eShop.Domain.Enums;
 using eShop.Main.Helpers;
 using eShop.Main.Responses;
 using Infrastructure.Data.Context;

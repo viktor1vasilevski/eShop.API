@@ -1,5 +1,5 @@
-﻿using Domain.Enums;
-using Domain.Models.Base;
+﻿using Domain.Models.Base;
+using eShop.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Data;

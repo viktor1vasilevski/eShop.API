@@ -1,7 +1,7 @@
-using Domain.Enums;
 using Domain.Interfaces;
 using Domain.Models;
 using eShop.Admin.Middlewares;
+using eShop.Domain.Enums;
 using eShop.Main.Helpers;
 using eShop.Main.Validations.Category;
 using FluentValidation;
