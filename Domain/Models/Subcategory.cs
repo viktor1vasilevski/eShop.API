@@ -11,6 +11,8 @@ public class Subcategory : AuditableBaseEntity
     public virtual Category? Category { get; set; }
     public virtual ICollection<Product>? Products { get; set; }
 
+    protected Subcategory() { }
+
     public Subcategory(Guid categoryId, string name)
     {
         SetCategoryId(categoryId);

@@ -6,10 +6,9 @@ namespace Domain.Models;
 public class Category : AuditableBaseEntity
 {
     public string Name { get; private set; } = string.Empty;
-
     public virtual ICollection<Subcategory>? Subcategories { get; set; }
 
-
+    protected Category() { }
     public Category(string name)
     {
         Rename(name);
