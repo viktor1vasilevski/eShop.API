@@ -2,12 +2,17 @@
 
 public static class AuthConstants
 {
-    public const string ERROR_LOGIN = "Error during login request.";
+    // Generic Errors
+    public const string ERROR_LOGIN = "An error occurred during the login process.";
 
-    public const string ADMIN_LOGIN_SUCCESS = "Admin login successful.";
-    public const string CUSTOMER_LOGIN_SUCCESS = "User login successful.";
+    // Success Messages
+    public const string ADMIN_LOGIN_SUCCESS = "Admin logged in successfully.";
+    public const string CUSTOMER_LOGIN_SUCCESS = "User logged in successfully.";
+    public const string CUSTOMER_REGISTER_SUCCESS = "User registered successfully.";
 
+    // Validation Errors
     public const string USER_NOT_FOUND = "User not found.";
-    public const string INVALID_PASSWORD = "Invalid password.";
+    public const string INVALID_PASSWORD = "The password you entered is incorrect.";
+    public const string ACCOUNT_ALREADY_EXISTS = "An account with the provided credentials already exists.";
 
 }

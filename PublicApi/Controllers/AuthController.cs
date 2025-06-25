@@ -1,4 +1,6 @@
-﻿namespace eShop.PublicApi.Controllers;
+﻿using eShop.Main.Requests.Auth;
+
+namespace eShop.PublicApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -11,6 +13,13 @@ public class AuthController(ICustomerAuthService customerAuthService) : BaseCont
     public async Task<IActionResult> LoginAsync([FromBody] UserLoginRequest request)
     {
         var response = await _customerAuthService.LoginAsync(request);
+        return HandleResponse(response);
+    }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> RegisterAsync([FromBody] UserRegisterRequest request)
+    {
+        var response = await _customerAuthService.RegisterAsync(request);
         return HandleResponse(response);
     }
 }
