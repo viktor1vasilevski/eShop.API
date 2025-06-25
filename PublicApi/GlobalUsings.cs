@@ -1,0 +1,12 @@
+﻿global using eShop.Main.Interfaces;
+global using Main.Requests.Auth;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Mvc;
+global using eShop.Main.Responses;
+global using Main.Enums;
+global using Domain.Interfaces;
+global using Infrastructure.Data.Context;
+global using Infrastructure.Data.Repositories;
+global using Microsoft.EntityFrameworkCore;
+global using PublicApi.Extension;
+global using Infrastructure.IoC;

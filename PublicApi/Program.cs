@@ -1,10 +1,3 @@
-using Domain.Interfaces;
-using Infrastructure.Data.Context;
-using Infrastructure.Data.Repositories;
-using Microsoft.EntityFrameworkCore;
-using PublicApi.Extension;
-using Infrastructure.IoC;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
