@@ -22,10 +22,8 @@
   <ItemGroup>
     <ProjectReference Include="..\eShop.ServiceDefaults\eShop.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Infrastructure.Data\eShop.Infrastructure.Data.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\Infrastructure.IoC\eShop.Infrastructure.IoC.csproj" />
+    <ProjectReference Include="..\Main\eShop.Main.csproj" />
   </ItemGroup>
 
 </Project>

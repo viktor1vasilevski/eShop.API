@@ -8,14 +8,14 @@ namespace Admin.eShop.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [AllowAnonymous]
-public class AdminAuthController(IAdminAuthService authService) : BaseController
+public class AuthController(IAuthService authService) : BaseController
 {
-    private readonly IAdminAuthService _adminAuthService = authService;
+    private readonly IAuthService _authService = authService;
 
-    [HttpPost("login")]
+    [HttpPost("admin/login")]
     public async Task<IActionResult> LoginAsync([FromBody] UserLoginRequest request)
     {
-        var response = await _adminAuthService.AdminLoginAsync(request);
+        var response = await _authService.LoginAsync(request);
         return HandleResponse(response);
     }
 }
