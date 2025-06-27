@@ -1,0 +1,17 @@
+﻿using eShop.Main.Requests.Product;
+
+namespace eShop.PublicApi.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class ProductController(IProductService productService) : BaseController
+{
+    private readonly IProductService _productService = productService;
+
+    [HttpGet]
+    public IActionResult Get([FromQuery] ProductRequest request)
+    {
+        var response = _productService.GetProducts(request);
+        return HandleResponse(response);
+    }
+}

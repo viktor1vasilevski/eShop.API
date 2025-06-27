@@ -2,7 +2,6 @@
 using Domain.Models;
 using eShop.Domain.Exceptions;
 using eShop.Main.Constants;
-using eShop.Main.DTOs.Category;
 using eShop.Main.DTOs.Product;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Product;
@@ -15,7 +14,10 @@ using Microsoft.Extensions.Logging;
 
 namespace eShop.Main.Services;
 
-public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryService> _logger) : IProductService
+public class ProductService(
+    IUnitOfWork<AppDbContext> _uow, 
+    ILogger<CategoryService> _logger,
+    IImageService _imageService) : IProductService
 {
     private readonly IGenericRepository<Product> _productRepository = _uow.GetGenericRepository<Product>();
     private readonly IGenericRepository<Subcategory> _subcategoryRepository = _uow.GetGenericRepository<Subcategory>();
@@ -71,7 +73,7 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
             Description = x.Description,
             UnitPrice = x.UnitPrice,
             UnitQuantity = x.UnitQuantity,
-            //ImageBase64 = x.Image != null ? $"data:{x.ImageType};base64,{Convert.ToBase64String(x.Image)}" : null,
+            Image = x.Image != null ? $"data:{x.ImageType};base64,{Convert.ToBase64String(x.Image)}" : null,
             Category = x.Subcategory.Category.Name,
             Subcategory = x.Subcategory.Name,
             SubcategoryId = x.SubcategoryId,
@@ -100,7 +102,9 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
 
         try
         {
-            var product = new Product(request.Name, request.Description, request.Price, request.Quantity, request.SubcategoryId);
+            string imageType = _imageService.ExtractImageType(request.Image);
+            byte[] imageBytes = _imageService.ConvertBase64ToBytes(request.Image);
+            var product = new Product(request.Name, request.Description, request.Price, request.Quantity, request.SubcategoryId, imageBytes, imageType);
             _productRepository.Insert(product);
             _uow.SaveChanges();
 
@@ -220,7 +224,9 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
 
         try
         {
-            product.Update(request.Name, request.Description, request.Price, request.Quantity, request.SubcategoryId);
+            string imageType = _imageService.ExtractImageType(request.Image);
+            byte[] imageBytes = _imageService.ConvertBase64ToBytes(request.Image);
+            product.Update(request.Name, request.Description, request.Price, request.Quantity, request.SubcategoryId, imageBytes, imageType);
             _productRepository.Update(product);
             _uow.SaveChanges();
 

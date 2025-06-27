@@ -9,39 +9,45 @@ public class Product : AuditableBaseEntity
     public string Description { get; set; } = string.Empty;
     public decimal UnitPrice { get; set; }
     public int UnitQuantity { get; set; }
+    public byte[] Image { get; set; }
+    public string ImageType { get; set; }
 
 
     public Guid SubcategoryId { get; set; }
     public virtual Subcategory? Subcategory { get; set; }
 
     protected Product() { }
-    public Product(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId)
+    public Product(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, byte[] imageBytes, string imageType)
     {
-        Initialize(name, description, unitPrice, unitQuantity, subcategoryId);
+        Initialize(name, description, unitPrice, unitQuantity, subcategoryId, imageBytes, imageType);
     }
 
-    public void Update(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId) => ApplyChanges(name, description, unitPrice, unitQuantity, subcategoryId);
+    public void Update(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, byte[] imageBytes, string imageType) => ApplyChanges(name, description, unitPrice, unitQuantity, subcategoryId, imageBytes, imageType);
 
-    private void ApplyChanges(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId)
+    private void ApplyChanges(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, byte[] imageBytes, string imageType)
     {
-        Validate(name, description, unitPrice, unitQuantity, subcategoryId);
+        Validate(name, description, unitPrice, unitQuantity, subcategoryId, imageBytes, imageType);
         Name = name;
         Description = description;
         UnitPrice = unitPrice;
         UnitQuantity = unitQuantity;
         SubcategoryId = subcategoryId;
+        Image = imageBytes;
+        ImageType = imageType;
     }
-    private void Initialize(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId)
+    private void Initialize(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, byte[] imageBytes, string imageType)
     {
-        Validate(name, description, unitPrice, unitQuantity, subcategoryId);
+        Validate(name, description, unitPrice, unitQuantity, subcategoryId, imageBytes, imageType);
         Name = name;
         Description = description;
         UnitPrice = unitPrice;
         UnitQuantity = unitQuantity;
         SubcategoryId = subcategoryId;
+        Image = imageBytes;
+        ImageType = imageType;
     }
 
-    private void Validate(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId)
+    private void Validate(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, byte[] imageBytes, string imageType)
     {
         if (subcategoryId == Guid.Empty)
             throw new DomainValidationException("Subcategory Id cannot be empty.");
@@ -63,5 +69,24 @@ public class Product : AuditableBaseEntity
 
         if (unitQuantity <= 0)
             throw new DomainValidationException("Unit quantity must be greater than zero.");
+
+        ValidateImage(imageBytes, imageType);
+    }
+
+    private void ValidateImage(byte[]? image, string? imageType)
+    {
+        if (image is null || image.Length == 0)
+            throw new DomainValidationException("Image must be provided.");
+
+        const int maxImageSizeInBytes = 5 * 1024 * 1024; // 5MB
+        if (image.Length > maxImageSizeInBytes)
+            throw new DomainValidationException("Image size cannot exceed 5MB.");
+
+        if (string.IsNullOrWhiteSpace(imageType))
+            throw new DomainValidationException("Image type must be provided.");
+
+        var allowedTypes = new[] { "jpeg", "png", "webp" };
+        if (!allowedTypes.Contains(imageType.ToLower()))
+            throw new DomainValidationException($"Unsupported image type: {imageType}");
     }
 }

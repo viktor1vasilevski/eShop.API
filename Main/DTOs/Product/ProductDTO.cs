@@ -9,6 +9,7 @@ public class ProductDTO
     public int UnitQuantity { get; set; } 
     public string Category { get; set; } = string.Empty;
     public string Subcategory { get; set; } = string.Empty;
+    public string Image { get; set; } = string.Empty;
     public Guid SubcategoryId { get; set; }
     public DateTime Created { get; set; }
     public DateTime? LastModified { get; set; }

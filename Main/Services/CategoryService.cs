@@ -3,6 +3,7 @@ using Domain.Models;
 using eShop.Domain.Exceptions;
 using eShop.Main.Constants;
 using eShop.Main.DTOs.Category;
+using eShop.Main.DTOs.Subcategory;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Category;
 using eShop.Main.Responses;
@@ -17,6 +18,7 @@ namespace eShop.Main.Services;
 public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryService> _logger) : ICategoryService
 {
     private readonly IGenericRepository<Category> _categoryRepository = _uow.GetGenericRepository<Category>();
+    private readonly IGenericRepository<Subcategory> _subcategoryRepository = _uow.GetGenericRepository<Subcategory>();
 
     public ApiResponse<List<CategoryDTO>> GetCategories(CategoryRequest request)
     {
@@ -225,4 +227,53 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         return category.Subcategories?.Any() == true ||
                category.Subcategories?.FirstOrDefault()?.Products?.Any() == true;
     }
+
+    public ApiResponse<List<CategoryWithSubcategoriesDTO>> GetCategoriesWithSubcategoriesForMenu()
+    {
+        var uncategorizedCategoryId = _categoryRepository
+            .Get(x => x.Name == "UNCATEGORIZED")
+            .Select(x => x.Id)
+            .FirstOrDefault();
+
+        var uncategorizedSubcategoryId = _subcategoryRepository
+            .Get(x => x.Name == "UNCATEGORIZED" && x.CategoryId == uncategorizedCategoryId)
+            .Select(x => x.Id)
+            .FirstOrDefault();
+
+        // Fetch all categories with subcategories and their products
+        var categories = _categoryRepository.Get(
+            filter: x => x.Id != uncategorizedCategoryId,
+            include: x => x.Include(c => c.Subcategories)
+                           .ThenInclude(sc => sc.Products)
+        );
+
+        var categoriesDto = categories
+            .Select(c => new CategoryWithSubcategoriesDTO
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Subcategories = c.Subcategories
+                    .Where(sc =>
+                        !string.Equals(sc.Name, "UNCATEGORIZED", StringComparison.OrdinalIgnoreCase) &&
+                        sc.Id != uncategorizedSubcategoryId &&
+                        sc.Products != null &&
+                        sc.Products.Any()
+                    )
+                    .Select(sc => new SelectSubcategoryListItemDTO
+                    {
+                        Id = sc.Id,
+                        Name = sc.Name
+                    })
+                    .ToList()
+            })
+            .Where(c => c.Subcategories.Any()) // Only keep categories that have valid subcategories
+            .ToList();
+
+        return new ApiResponse<List<CategoryWithSubcategoriesDTO>>
+        {
+            Success = true,
+            Data = categoriesDto
+        };
+    }
+
 }
