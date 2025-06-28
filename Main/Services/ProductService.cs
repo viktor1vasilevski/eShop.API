@@ -102,9 +102,7 @@ public class ProductService(
 
         try
         {
-            string imageType = _imageService.ExtractImageType(request.Image);
-            byte[] imageBytes = _imageService.ConvertBase64ToBytes(request.Image);
-            var product = new Product(request.Name, request.Description, request.Price, request.Quantity, request.SubcategoryId, imageBytes, imageType);
+            var product = new Product(request.Name, request.Description, request.Price, request.Quantity, request.SubcategoryId, request.Image);
             _productRepository.Insert(product);
             _uow.SaveChanges();
 
@@ -224,9 +222,7 @@ public class ProductService(
 
         try
         {
-            string imageType = _imageService.ExtractImageType(request.Image);
-            byte[] imageBytes = _imageService.ConvertBase64ToBytes(request.Image);
-            product.Update(request.Name, request.Description, request.Price, request.Quantity, request.SubcategoryId, imageBytes, imageType);
+            product.Update(request.Name, request.Description, request.Price, request.Quantity, request.SubcategoryId, request.Image);
             _productRepository.Update(product);
             _uow.SaveChanges();
 

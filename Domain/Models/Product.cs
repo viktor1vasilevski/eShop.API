@@ -12,21 +12,28 @@ public class Product : AuditableBaseEntity
     public byte[] Image { get; set; }
     public string ImageType { get; set; }
 
-
     public Guid SubcategoryId { get; set; }
     public virtual Subcategory? Subcategory { get; set; }
 
     protected Product() { }
-    public Product(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, byte[] imageBytes, string imageType)
+
+    public Product(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, string image)
     {
-        Initialize(name, description, unitPrice, unitQuantity, subcategoryId, imageBytes, imageType);
+        Initialize(name, description, unitPrice, unitQuantity, subcategoryId, image);
     }
 
-    public void Update(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, byte[] imageBytes, string imageType) => ApplyChanges(name, description, unitPrice, unitQuantity, subcategoryId, imageBytes, imageType);
-
-    private void ApplyChanges(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, byte[] imageBytes, string imageType)
+    public void Update(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, string image)
     {
+        ApplyChanges(name, description, unitPrice, unitQuantity, subcategoryId, image);
+    }
+
+    private void Initialize(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, string image)
+    {
+        var imageBytes = ConvertBase64ToBytes(image);
+        var imageType = ExtractImageType(image);
+
         Validate(name, description, unitPrice, unitQuantity, subcategoryId, imageBytes, imageType);
+
         Name = name;
         Description = description;
         UnitPrice = unitPrice;
@@ -35,9 +42,14 @@ public class Product : AuditableBaseEntity
         Image = imageBytes;
         ImageType = imageType;
     }
-    private void Initialize(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, byte[] imageBytes, string imageType)
+
+    private void ApplyChanges(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, string image)
     {
+        var imageBytes = ConvertBase64ToBytes(image);
+        var imageType = ExtractImageType(image);
+
         Validate(name, description, unitPrice, unitQuantity, subcategoryId, imageBytes, imageType);
+
         Name = name;
         Description = description;
         UnitPrice = unitPrice;
@@ -73,13 +85,13 @@ public class Product : AuditableBaseEntity
         ValidateImage(imageBytes, imageType);
     }
 
-    private void ValidateImage(byte[]? image, string? imageType)
+    private void ValidateImage(byte[] imageBytes, string imageType)
     {
-        if (image is null || image.Length == 0)
+        if (imageBytes == null || imageBytes.Length == 0)
             throw new DomainValidationException("Image must be provided.");
 
         const int maxImageSizeInBytes = 5 * 1024 * 1024; // 5MB
-        if (image.Length > maxImageSizeInBytes)
+        if (imageBytes.Length > maxImageSizeInBytes)
             throw new DomainValidationException("Image size cannot exceed 5MB.");
 
         if (string.IsNullOrWhiteSpace(imageType))
@@ -88,5 +100,27 @@ public class Product : AuditableBaseEntity
         var allowedTypes = new[] { "jpeg", "png", "webp" };
         if (!allowedTypes.Contains(imageType.ToLower()))
             throw new DomainValidationException($"Unsupported image type: {imageType}");
+    }
+
+    private byte[] ConvertBase64ToBytes(string base64String)
+    {
+        if (string.IsNullOrEmpty(base64String)) return Array.Empty<byte>();
+
+        string base64Data = base64String.Contains("base64,")
+            ? base64String.Substring(base64String.IndexOf("base64,") + 7)
+            : base64String;
+
+        return Convert.FromBase64String(base64Data);
+    }
+
+    private string ExtractImageType(string base64String)
+    {
+        if (string.IsNullOrEmpty(base64String)) return string.Empty;
+
+        var parts = base64String.Split(';');
+        if (parts.Length == 0 || !parts[0].Contains("/")) return string.Empty;
+
+        var typeParts = parts[0].Split('/');
+        return typeParts.Length > 1 ? typeParts[1] : string.Empty;
     }
 }
