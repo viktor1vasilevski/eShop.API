@@ -102,7 +102,15 @@ public class ProductService(
 
         try
         {
-            var product = new Product(request.Name, request.Description, request.Price, request.Quantity, request.SubcategoryId, request.Image);
+            var productData = new ProductData(
+                name: request.Name,
+                description: request.Description,
+                unitPrice: request.Price,
+                unitQuantity: request.Quantity,
+                subcategoryId: request.SubcategoryId,
+                base64Image: request.Image);
+
+            var product = new Product(productData);
             _productRepository.Insert(product);
             _uow.SaveChanges();
 
@@ -222,7 +230,15 @@ public class ProductService(
 
         try
         {
-            product.Update(request.Name, request.Description, request.Price, request.Quantity, request.SubcategoryId, request.Image);
+            var productData = new ProductData(
+                name: request.Name,
+                description: request.Description,
+                unitPrice: request.Price,
+                unitQuantity: request.Quantity,
+                subcategoryId: request.SubcategoryId,
+                base64Image: request.Image);
+
+            product.Update(productData);
             _productRepository.Update(product);
             _uow.SaveChanges();
 
@@ -243,7 +259,5 @@ public class ProductService(
                 Message = ex.Message
             };
         }
-
-
     }
 }

@@ -9,77 +9,61 @@ public class Product : AuditableBaseEntity
     public string Description { get; set; } = string.Empty;
     public decimal UnitPrice { get; set; }
     public int UnitQuantity { get; set; }
-    public byte[] Image { get; set; }
-    public string ImageType { get; set; }
+    public byte[] Image { get; set; } = [];
+    public string ImageType { get; set; } = string.Empty;
 
     public Guid SubcategoryId { get; set; }
     public virtual Subcategory? Subcategory { get; set; }
 
     protected Product() { }
 
-    public Product(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, string image)
+    public Product(ProductData product)
     {
-        Initialize(name, description, unitPrice, unitQuantity, subcategoryId, image);
+        ApplyProductData(product);
     }
 
-    public void Update(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, string image)
+    public void Update(ProductData product)
     {
-        ApplyChanges(name, description, unitPrice, unitQuantity, subcategoryId, image);
+        ApplyProductData(product);
     }
 
-    private void Initialize(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, string image)
+    private void ApplyProductData(ProductData product)
     {
-        var imageBytes = ConvertBase64ToBytes(image);
-        var imageType = ExtractImageType(image);
+        var imageBytes = ConvertBase64ToBytes(product.Base64Image);
+        var imageType = ExtractImageType(product.Base64Image);
 
-        Validate(name, description, unitPrice, unitQuantity, subcategoryId, imageBytes, imageType);
+        Validate(product, imageBytes, imageType);
 
-        Name = name;
-        Description = description;
-        UnitPrice = unitPrice;
-        UnitQuantity = unitQuantity;
-        SubcategoryId = subcategoryId;
+        Name = product.Name;
+        Description = product.Description;
+        UnitPrice = product.UnitPrice;
+        UnitQuantity = product.UnitQuantity;
+        SubcategoryId = product.SubcategoryId;
         Image = imageBytes;
         ImageType = imageType;
     }
 
-    private void ApplyChanges(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, string image)
+    private void Validate(ProductData product, byte[] imageBytes, string imageType)
     {
-        var imageBytes = ConvertBase64ToBytes(image);
-        var imageType = ExtractImageType(image);
-
-        Validate(name, description, unitPrice, unitQuantity, subcategoryId, imageBytes, imageType);
-
-        Name = name;
-        Description = description;
-        UnitPrice = unitPrice;
-        UnitQuantity = unitQuantity;
-        SubcategoryId = subcategoryId;
-        Image = imageBytes;
-        ImageType = imageType;
-    }
-
-    private void Validate(string name, string description, decimal unitPrice, int unitQuantity, Guid subcategoryId, byte[] imageBytes, string imageType)
-    {
-        if (subcategoryId == Guid.Empty)
+        if (product.SubcategoryId == Guid.Empty)
             throw new DomainValidationException("Subcategory Id cannot be empty.");
 
-        if (string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(product.Name))
             throw new DomainValidationException("Name cannot be empty.");
 
-        if (name.Length > 50)
+        if (product.Name.Length > 50)
             throw new DomainValidationException("Brand name cannot exceed 50 characters.");
 
-        if (string.IsNullOrWhiteSpace(description))
+        if (string.IsNullOrWhiteSpace(product.Description))
             throw new DomainValidationException("Brand cannot be empty.");
 
-        if (description.Length > 500)
+        if (product.Description.Length > 500)
             throw new DomainValidationException("Description cannot exceed 500 characters.");
 
-        if (unitPrice <= 0)
+        if (product.UnitPrice <= 0)
             throw new DomainValidationException("Unit price must be greater than zero.");
 
-        if (unitQuantity <= 0)
+        if (product.UnitQuantity <= 0)
             throw new DomainValidationException("Unit quantity must be greater than zero.");
 
         ValidateImage(imageBytes, imageType);
@@ -122,5 +106,31 @@ public class Product : AuditableBaseEntity
 
         var typeParts = parts[0].Split('/');
         return typeParts.Length > 1 ? typeParts[1] : string.Empty;
+    }
+}
+
+public class ProductData
+{
+    public string Name { get; }
+    public string Description { get; }
+    public decimal UnitPrice { get; }
+    public int UnitQuantity { get; }
+    public Guid SubcategoryId { get; }
+    public string Base64Image { get; }
+
+    public ProductData(
+        string name,
+        string description,
+        decimal unitPrice,
+        int unitQuantity,
+        Guid subcategoryId,
+        string base64Image)
+    {
+        Name = name;
+        Description = description;
+        UnitPrice = unitPrice;
+        UnitQuantity = unitQuantity;
+        SubcategoryId = subcategoryId;
+        Base64Image = base64Image;
     }
 }
