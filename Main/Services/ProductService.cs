@@ -189,7 +189,8 @@ public class ProductService(
             Subcategory = product.Subcategory?.Name,
             Category = product.Subcategory?.Category?.Name,
             LastModified = product.LastModified,
-            Created = product.Created
+            Created = product.Created,
+            Image = product.Image != null ? $"data:{product.ImageType};base64,{Convert.ToBase64String(product.Image)}" : null,
         };
 
 
