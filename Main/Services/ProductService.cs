@@ -16,8 +16,7 @@ namespace eShop.Main.Services;
 
 public class ProductService(
     IUnitOfWork<AppDbContext> _uow, 
-    ILogger<CategoryService> _logger,
-    IImageService _imageService) : IProductService
+    ILogger<CategoryService> _logger) : IProductService
 {
     private readonly IGenericRepository<Product> _productRepository = _uow.GetGenericRepository<Product>();
     private readonly IGenericRepository<Subcategory> _subcategoryRepository = _uow.GetGenericRepository<Subcategory>();
