@@ -1,12 +1,12 @@
 ﻿using Domain.Interfaces;
 using Domain.Models;
 using eShop.Domain.Exceptions;
+using eShop.Infrastructure.Data.Context;
 using eShop.Main.Constants;
 using eShop.Main.DTOs.Product;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Product;
 using eShop.Main.Responses;
-using Infrastructure.Data.Context;
 using Main.Enums;
 using Main.Extensions;
 using Microsoft.EntityFrameworkCore;

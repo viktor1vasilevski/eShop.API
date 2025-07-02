@@ -1,9 +1,9 @@
 ﻿using Domain.Interfaces;
 using Domain.Models;
 using eShop.Domain.Enums;
+using eShop.Infrastructure.Data.Context;
 using eShop.Main.Helpers;
 using eShop.Main.Responses;
-using Infrastructure.Data.Context;
 using Main.Constants;
 using Main.DTOs.Auth;
 using Main.Enums;

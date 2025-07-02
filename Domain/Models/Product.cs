@@ -1,5 +1,6 @@
 ﻿using Domain.Models.Base;
 using eShop.Domain.Exceptions;
+using eShop.Domain.Models;
 
 namespace Domain.Models;
 
@@ -14,6 +15,7 @@ public class Product : AuditableBaseEntity
 
     public Guid SubcategoryId { get; set; }
     public virtual Subcategory? Subcategory { get; set; }
+    public ICollection<BasketItem> BasketItems { get; set; } = new List<BasketItem>();
 
     protected Product() { }
 

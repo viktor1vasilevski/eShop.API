@@ -1,12 +1,12 @@
 ﻿using Domain.Interfaces;
 using Domain.Models;
 using eShop.Domain.Enums;
+using eShop.Infrastructure.Data.Context;
 using eShop.Main.DTOs.Auth;
 using eShop.Main.Helpers;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Auth;
 using eShop.Main.Responses;
-using Infrastructure.Data.Context;
 using Main.Constants;
 using Main.DTOs.Auth;
 using Main.Enums;
@@ -15,7 +15,6 @@ using Main.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -38,7 +37,7 @@ public class CustomerAuthService(IUnitOfWork<AppDbContext> _uow,
             {
                 Message = AuthConstants.USER_NOT_FOUND,
                 Success = false,
-                NotificationType = NotificationType.BadRequest
+                NotificationType = NotificationType.NotFound
             };
         }
 

@@ -1,3 +1,5 @@
+using eShop.Infrastructure.Data.Context;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();

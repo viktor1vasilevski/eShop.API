@@ -1,10 +1,10 @@
 ﻿using Domain.Interfaces;
 using Domain.Models;
+using eShop.Infrastructure.Data.Context;
 using eShop.Main.DTOs.Category;
 using eShop.Main.DTOs.User;
 using eShop.Main.Interfaces;
 using eShop.Main.Responses;
-using Infrastructure.Data.Context;
 using Main.Enums;
 using Microsoft.Extensions.Logging;
 

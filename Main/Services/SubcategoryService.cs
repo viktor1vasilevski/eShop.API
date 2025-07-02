@@ -1,6 +1,7 @@
 ﻿using Domain.Interfaces;
 using Domain.Models;
 using eShop.Domain.Exceptions;
+using eShop.Infrastructure.Data.Context;
 using eShop.Main.Constants;
 using eShop.Main.DTOs.Category;
 using eShop.Main.DTOs.Subcategory;
@@ -8,7 +9,6 @@ using eShop.Main.Interfaces;
 using eShop.Main.Requests.Category;
 using eShop.Main.Requests.Subcategory;
 using eShop.Main.Responses;
-using Infrastructure.Data.Context;
 using Main.Enums;
 using Main.Extensions;
 using Microsoft.EntityFrameworkCore;
