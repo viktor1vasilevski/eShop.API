@@ -1,4 +1,5 @@
 ﻿using Domain.Interfaces;
+using eShop.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data.Repositories;

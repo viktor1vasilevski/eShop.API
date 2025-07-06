@@ -1,5 +1,6 @@
 ﻿using Domain.Interfaces;
 using Domain.Models;
+using eShop.Domain.Interfaces;
 using eShop.Infrastructure.Data.Context;
 using eShop.Main.DTOs.Category;
 using eShop.Main.DTOs.User;

@@ -1,6 +1,7 @@
 ﻿using Domain.Interfaces;
 using Domain.Models;
 using eShop.Domain.Exceptions;
+using eShop.Domain.Interfaces;
 using eShop.Infrastructure.Data.Context;
 using eShop.Main.Constants;
 using eShop.Main.DTOs.Product;

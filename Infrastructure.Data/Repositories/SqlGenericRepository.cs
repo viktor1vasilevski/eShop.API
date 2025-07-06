@@ -1,4 +1,4 @@
-﻿using Domain.Interfaces;
+﻿using eShop.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;

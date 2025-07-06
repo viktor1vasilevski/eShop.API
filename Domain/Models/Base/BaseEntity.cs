@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace eShop.Domain.Models.Base;
 
-namespace Domain.Models.Base
+public abstract class BaseEntity
 {
-    public abstract class BaseEntity
-    {
-        public virtual Guid Id { get; set; }
-    }
+    public virtual Guid Id { get; set; }
 }
