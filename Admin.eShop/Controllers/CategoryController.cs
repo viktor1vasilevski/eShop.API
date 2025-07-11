@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eShop.Admin.Controllers;
 
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 public class CategoryController(ICategoryService categoryService) : BaseController
 {
     private readonly ICategoryService _categoryService = categoryService;

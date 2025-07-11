@@ -43,9 +43,7 @@ public class CustomerAuthService(IUnitOfWork<AppDbContext> _uow,
             };
         }
 
-        var isPasswordValid = PasswordHasher.VerifyPassword(request.Password, user.PasswordHash, user.SaltKey);
-
-        if (!isPasswordValid)
+        if (!user.VerifyPassword(request.Password))
         {
             return new ApiResponse<LoginDTO>
             {
