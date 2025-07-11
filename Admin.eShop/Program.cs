@@ -46,6 +46,7 @@ using (var scope = app.Services.CreateScope())
 
         AppDbContextSeed.SeedUncategorizedCategory(dbContext);
         AppDbContextSeed.SeedUncategorizedSubcategory(dbContext);
+        AppDbContextSeed.SeedTestUser(dbContext);
     }
     catch (Exception ex)
     {

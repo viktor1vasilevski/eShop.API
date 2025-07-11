@@ -1,7 +1,4 @@
-﻿using Main.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using Main.Requests.Auth;
-using Microsoft.AspNetCore.Authorization;
+﻿using Main.Requests.Auth;
 
 namespace Admin.eShop.Controllers;
 

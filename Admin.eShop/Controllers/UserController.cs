@@ -1,10 +1,4 @@
-﻿using Admin.eShop.Controllers;
-using eShop.Main.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-
-namespace eShop.Admin.Controllers;
+﻿namespace eShop.Admin.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

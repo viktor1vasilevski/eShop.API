@@ -1,6 +1,5 @@
 ﻿using eShop.Main.Interfaces;
 using eShop.Main.Services;
-using Main.Interfaces;
 using Main.Services;
 using Microsoft.Extensions.DependencyInjection;
 

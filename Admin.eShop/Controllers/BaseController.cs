@@ -1,6 +1,4 @@
 ﻿using eShop.Main.Responses;
-using Main.Enums;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Admin.eShop.Controllers;
 

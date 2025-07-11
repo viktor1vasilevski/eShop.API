@@ -2,7 +2,7 @@
 using Main.DTOs.Auth;
 using Main.Requests.Auth;
 
-namespace Main.Interfaces;
+namespace eShop.Main.Interfaces;
 
 public interface IAuthService
 {
