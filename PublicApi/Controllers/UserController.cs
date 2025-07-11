@@ -1,4 +1,6 @@
-﻿namespace eShop.PublicApi.Controllers;
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace eShop.PublicApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

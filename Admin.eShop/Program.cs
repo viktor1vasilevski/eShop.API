@@ -58,93 +58,20 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var serviceProvider = scope.ServiceProvider;
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
     try
     {
-        var dbContext = serviceProvider.GetRequiredService<AppDbContext>();
+        var password = builder.Configuration["SeedAdmin:Password"];
+        AppDbContextSeed.SeedAdminUser(dbContext, password);
 
-        // Apply any pending migrations
-        dbContext.Database.Migrate();
-
-        var uncatgorizedCategory = dbContext.Categories.Any(x => x.Name == "UNCATEGORIZED");
-        if (!uncatgorizedCategory)
-        {
-            var category = new Category("UNCATEGORIZED");
-
-            dbContext.Categories.Add(category);
-            dbContext.SaveChanges();
-        }
-
-
-        var uncatgorizedSubcategory = dbContext.Subcategories.Any(x => x.Name == "UNCATEGORIZED");
-        if (!uncatgorizedSubcategory)
-        {
-            var category = dbContext.Categories.Where(x => x.Name == "UNCATEGORIZED").First();
-
-            var subcategory = new Subcategory(category.Id, "UNCATEGORIZED");
-
-            dbContext.Subcategories.Add(subcategory);
-            dbContext.SaveChanges();
-        }
-
-
-
-        var adminExist = dbContext.Users.Any(x => x.Role == Role.Admin);
-
-        if (!adminExist)
-        {
-
-            var saltKey = PasswordHasher.GenerateSalt();
-            var adminUser = new User
-            {
-                FirstName = "Admin",
-                LastName = "Admin",
-                Email = "admin@example.com",
-                Username = "admin",
-                Role = Role.Admin,
-                PasswordHash = PasswordHasher.HashPassword("Admin@123", saltKey),
-                SaltKey = Convert.ToBase64String(saltKey),
-                CreatedBy = "Admin",
-                Created = DateTime.Now,
-                LastModifiedBy = null,
-                LastModified = null
-            };
-
-            dbContext.Users.Add(adminUser);
-            dbContext.SaveChanges();
-
-        }
-
-        var customerExist = dbContext.Users.Any(x => x.Role == Role.Customer);
-
-        if (!customerExist) 
-        {
-            var saltKey = PasswordHasher.GenerateSalt();
-            var adminUser = new User
-            {
-                FirstName = "Test",
-                LastName = "Test",
-                Email = "test@example.com",
-                Username = "testtest",
-                Role = Role.Customer,
-                PasswordHash = PasswordHasher.HashPassword("Test@123", saltKey),
-                SaltKey = Convert.ToBase64String(saltKey),
-                CreatedBy = "Admin",
-                Created = DateTime.Now,
-                LastModifiedBy = null,
-                LastModified = null
-            };
-
-            dbContext.Users.Add(adminUser);
-            dbContext.SaveChanges();
-        }
-
-
+        AppDbContextSeed.SeedUncategorizedCategory(dbContext);
+        AppDbContextSeed.SeedUncategorizedSubcategory(dbContext);
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error during admin user setup: {ex.Message}");
+        logger.LogError(ex, "Error during data seeding");
     }
 }
 
@@ -157,12 +84,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseCors("MyPolicy");
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-
 app.UseAuthorization();
-
 app.UseAuthentication();
 
 app.MapControllers();

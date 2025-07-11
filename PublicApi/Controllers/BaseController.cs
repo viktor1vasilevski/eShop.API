@@ -1,4 +1,8 @@
-﻿namespace eShop.PublicApi.Controllers;
+﻿using eShop.Main.Responses;
+using Main.Enums;
+using Microsoft.AspNetCore.Mvc;
+
+namespace eShop.PublicApi.Controllers;
 
 [ApiController]
 public abstract class BaseController : ControllerBase

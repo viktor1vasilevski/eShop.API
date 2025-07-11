@@ -1,4 +1,6 @@
-﻿using eShop.Main.Requests.Product;
+﻿using eShop.Main.Interfaces;
+using eShop.Main.Requests.Product;
+using Microsoft.AspNetCore.Mvc;
 
 namespace eShop.PublicApi.Controllers;
 

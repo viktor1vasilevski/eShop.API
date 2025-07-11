@@ -1,4 +1,8 @@
+using Domain.Interfaces;
 using eShop.Infrastructure.Data.Context;
+using Infrastructure.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Infrastructure.IoC;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,9 +24,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped(typeof(IUnitOfWork<>), typeof(SqlUnitOfWork<>));
 builder.Services.AddIoCService();
-
-
-builder.Services.AddSwagger();
 
 var app = builder.Build();
 

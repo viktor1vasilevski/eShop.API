@@ -3,7 +3,6 @@ using Domain.Models;
 using eShop.Domain.Enums;
 using eShop.Domain.Interfaces;
 using eShop.Infrastructure.Data.Context;
-using eShop.Main.Helpers;
 using eShop.Main.Responses;
 using Main.Constants;
 using Main.DTOs.Auth;
@@ -11,7 +10,6 @@ using Main.Enums;
 using Main.Interfaces;
 using Main.Requests.Auth;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -20,8 +18,7 @@ using System.Text;
 namespace Main.Services
 {
     public class AuthService(IUnitOfWork<AppDbContext> _uow, 
-        IConfiguration _configuration, 
-        ILogger<AuthService> _logger) : IAuthService
+        IConfiguration _configuration) : IAuthService
     {
         private readonly IGenericRepository<User> _userRepository = _uow.GetGenericRepository<User>();
 
@@ -40,17 +37,14 @@ namespace Main.Services
                 };
             }
 
-            var isPasswordValid = PasswordHasher.VerifyPassword(request.Password, user.PasswordHash, user.SaltKey);
-
-            if (!isPasswordValid)
-            {
+            if (!user.VerifyPassword(request.Password))
                 return new ApiResponse<LoginDTO>
                 {
                     Message = AuthConstants.INVALID_PASSWORD,
                     Success = false,
-                    NotificationType = NotificationType.BadRequest
+                    NotificationType = NotificationType.NotFound
                 };
-            }
+
 
             var token = GenerateJwtToken(user);
 

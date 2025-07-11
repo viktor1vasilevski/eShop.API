@@ -21,4 +21,8 @@
     <ProjectReference Include="..\Main\eShop.Main.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+
 </Project>
