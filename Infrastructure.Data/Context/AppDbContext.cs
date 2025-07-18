@@ -15,13 +15,13 @@ public class AppDbContext : DbContext
     {
 
     }
+    public DbSet<Category> Categories => Set<Category>();
+    public DbSet<Subcategory> Subcategories => Set<Subcategory>();
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Basket> Baskets => Set<Basket>();
+    public DbSet<BasketItem> BasketItems => Set<BasketItem>();
 
-    public DbSet<Category> Categories { get; set; }
-    public DbSet<Subcategory> Subcategories { get; set; }
-    public DbSet<Product> Products { get; set; }
-    public DbSet<User> Users { get; set; }
-    public DbSet<Basket> Baskets { get; set; }
-    public DbSet<BasketItem> BasketItems { get; set; }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
