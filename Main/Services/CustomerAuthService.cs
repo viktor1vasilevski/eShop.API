@@ -5,7 +5,6 @@ using eShop.Domain.Exceptions;
 using eShop.Domain.Interfaces;
 using eShop.Infrastructure.Data.Context;
 using eShop.Main.DTOs.Auth;
-using eShop.Main.Helpers;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Auth;
 using eShop.Main.Responses;

@@ -9,6 +9,7 @@ using Infrastructure.Data.Repositories;
 using Infrastructure.IoC;
 using Microsoft.EntityFrameworkCore;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
