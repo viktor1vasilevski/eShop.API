@@ -17,6 +17,7 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddCors(policy => policy.AddPolicy("MyPolicy", builder =>
 {

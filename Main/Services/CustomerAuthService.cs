@@ -125,7 +125,12 @@ public class CustomerAuthService(IUnitOfWork<AppDbContext> _uow,
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[] { new Claim(ClaimTypes.Role, user.Role.ToString()) };
+        var claims = new[]
+        {
+                new Claim(ClaimTypes.Role, user.Role.ToString()),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+                new Claim(ClaimTypes.Name, user.Username)
+            };
 
         var token = new JwtSecurityToken(
             claims: claims,

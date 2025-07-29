@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Domain.Interfaces;
+﻿using Domain.Interfaces;
 using Domain.Models;
 using eShop.Domain.Interfaces;
 using eShop.Domain.Models;

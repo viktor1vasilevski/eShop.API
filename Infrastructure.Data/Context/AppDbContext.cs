@@ -1,20 +1,17 @@
 ﻿using Domain.Models;
 using Domain.Models.Base;
 using eShop.Domain.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace eShop.Infrastructure.Data.Context;
 
-public class AppDbContext : DbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options, IHttpContextAccessor httpContextAccessor) 
+    : DbContext(options)
 {
-    public AppDbContext()
-    {
-            
-    }
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-    }
+
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Subcategory> Subcategories => Set<Subcategory>();
     public DbSet<Product> Products => Set<Product>();
@@ -23,36 +20,37 @@ public class AppDbContext : DbContext
     public DbSet<BasketItem> BasketItems => Set<BasketItem>();
 
 
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var entries = ChangeTracker
             .Entries()
-            .Where(e => e.Entity is AuditableBaseEntity && (
-                    e.State == EntityState.Added
-                    || e.State == EntityState.Modified));
+            .Where(e => e.Entity is AuditableBaseEntity &&
+                       (e.State == EntityState.Added || e.State == EntityState.Modified));
 
-        foreach (var entityEntry in entries)
+        var username = _httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "System";
+
+        foreach (var entry in entries)
         {
-            if (entityEntry.State == EntityState.Added)
-            {
-                ((AuditableBaseEntity)entityEntry.Entity).Created = DateTime.Now;
-                ((AuditableBaseEntity)entityEntry.Entity).CreatedBy = "Admin";
-            }
-            else
-            {
-                Entry((AuditableBaseEntity)entityEntry.Entity).Property(p => p.Created).IsModified = false;
-                Entry((AuditableBaseEntity)entityEntry.Entity).Property(p => p.CreatedBy).IsModified = false;
-            }
+            var entity = (AuditableBaseEntity)entry.Entity;
 
-            if (entityEntry.State == EntityState.Modified)
+            if (entry.State == EntityState.Added)
             {
-                ((AuditableBaseEntity)entityEntry.Entity).LastModified = DateTime.Now;
-                ((AuditableBaseEntity)entityEntry.Entity).LastModifiedBy = "Admin";
+                entity.Created = DateTime.Now;
+                entity.CreatedBy = username;
+            }
+            else if (entry.State == EntityState.Modified)
+            {
+                entry.Property("Created").IsModified = false;
+                entry.Property("CreatedBy").IsModified = false;
+
+                entity.LastModified = DateTime.Now;
+                entity.LastModifiedBy = username;
             }
         }
 
-        return await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return await base.SaveChangesAsync(cancellationToken);
     }
+
     public override int SaveChanges() =>
           SaveChangesAsync().GetAwaiter().GetResult();
 

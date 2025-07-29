@@ -1,11 +1,14 @@
 ﻿using eShop.Main.Interfaces;
 using eShop.Main.Requests.Cart;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eShop.PublicApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Customer")]
     public class BasketController(IBasketService basketService) : BaseController
     {
         private readonly IBasketService _basketService = basketService;
