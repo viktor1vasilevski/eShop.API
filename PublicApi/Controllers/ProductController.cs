@@ -6,9 +6,8 @@ namespace eShop.PublicApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ProductController(IProductService productService) : BaseController
+public class ProductController(IProductService _productService) : BaseController
 {
-    private readonly IProductService _productService = productService;
 
     [HttpGet]
     public IActionResult Get([FromQuery] ProductRequest request)

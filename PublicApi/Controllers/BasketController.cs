@@ -9,9 +9,8 @@ namespace eShop.PublicApi.Controllers
     [Route("api/[controller]")]
     [ApiController]
     //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Customer")]
-    public class BasketController(IBasketService basketService) : BaseController
+    public class BasketController(IBasketService _basketService) : BaseController
     {
-        private readonly IBasketService _basketService = basketService;
 
 
         [HttpPost("Merge/{userId}")]

@@ -5,9 +5,8 @@ namespace eShop.PublicApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CategoryController(ICategoryService categoryService) : BaseController
+public class CategoryController(ICategoryService _categoryService) : BaseController
 {
-    private readonly ICategoryService _categoryService = categoryService;
 
 
     [HttpGet("CategoriesWithSubcategoriesForMenu")]

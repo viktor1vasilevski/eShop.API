@@ -9,9 +9,8 @@ namespace eShop.PublicApi.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [AllowAnonymous]
-public class AuthController(ICustomerAuthService customerAuthService) : BaseController
+public class AuthController(ICustomerAuthService _customerAuthService) : BaseController
 {
-    private readonly ICustomerAuthService _customerAuthService = customerAuthService;
 
     [HttpPost("login")]
     public async Task<IActionResult> LoginAsync([FromBody] UserLoginRequest request)
