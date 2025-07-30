@@ -17,8 +17,7 @@ using System.Text;
 
 namespace Main.Services
 {
-    public class AuthService(IUnitOfWork<AppDbContext> _uow, 
-        IConfiguration _configuration) : IAuthService
+    public class AuthService(IUnitOfWork<AppDbContext> _uow, IConfiguration _configuration) : IAuthService
     {
         private readonly IGenericRepository<User> _userRepository = _uow.GetGenericRepository<User>();
 

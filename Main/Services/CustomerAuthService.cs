@@ -22,11 +22,10 @@ using System.Text;
 
 namespace eShop.Main.Services;
 
-public class CustomerAuthService(IUnitOfWork<AppDbContext> _uow,
-        IConfiguration _configuration,
-        ILogger<AuthService> _logger) : ICustomerAuthService
+public class CustomerAuthService(IUnitOfWork<AppDbContext> _uow, IConfiguration _configuration, ILogger<AuthService> _logger) : ICustomerAuthService
 {
     private readonly IGenericRepository<User> _userRepository = _uow.GetGenericRepository<User>();
+
     public async Task<ApiResponse<LoginDTO>> LoginAsync(UserLoginRequest request)
     {
         var response = await _userRepository.GetAsync(x => x.Username.ToLower() == request.Username.ToLower());

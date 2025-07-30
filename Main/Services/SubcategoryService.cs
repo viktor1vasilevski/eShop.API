@@ -7,7 +7,6 @@ using eShop.Main.Constants;
 using eShop.Main.DTOs.Category;
 using eShop.Main.DTOs.Subcategory;
 using eShop.Main.Interfaces;
-using eShop.Main.Requests.Category;
 using eShop.Main.Requests.Subcategory;
 using eShop.Main.Responses;
 using Main.Enums;

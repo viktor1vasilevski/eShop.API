@@ -15,12 +15,11 @@ using Microsoft.Extensions.Logging;
 
 namespace eShop.Main.Services;
 
-public class ProductService(
-    IUnitOfWork<AppDbContext> _uow, 
-    ILogger<CategoryService> _logger) : IProductService
+public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryService> _logger) : IProductService
 {
     private readonly IGenericRepository<Product> _productRepository = _uow.GetGenericRepository<Product>();
     private readonly IGenericRepository<Subcategory> _subcategoryRepository = _uow.GetGenericRepository<Subcategory>();
+
 
     public ApiResponse<List<ProductDTO>> GetProducts(ProductRequest request)
     {

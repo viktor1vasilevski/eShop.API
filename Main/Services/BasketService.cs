@@ -17,6 +17,7 @@ public class BasketService(IUnitOfWork<AppDbContext> uow) : IBasketService
     private readonly IGenericRepository<Product> _productRepository = uow.GetGenericRepository<Product>();
     private readonly IGenericRepository<User> _userRepository = uow.GetGenericRepository<User>();
     private readonly IGenericRepository<BasketItem> _basketItemRepository = uow.GetGenericRepository<BasketItem>();
+
     public async Task<ApiResponse<string>> Merge(Guid userId, List<BasketRequest> request)
     {
         var userExists = await _userRepository.ExistsAsync(x => x.Id == userId);

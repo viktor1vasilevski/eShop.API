@@ -14,6 +14,8 @@ namespace eShop.Main.Services;
 public class UserService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryService> _logger) : IUserService
 {
     private readonly IGenericRepository<User> _userRepository = _uow.GetGenericRepository<User>();
+
+
     public ApiResponse<List<UserDTO>> GetUsers()
     {
         var users = _userRepository.GetAsQueryable();
