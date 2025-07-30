@@ -17,39 +17,27 @@ using System.Text;
 
 namespace Main.Services
 {
-    public class AuthService(IUnitOfWork<AppDbContext> _uow, IConfiguration _configuration) : IAuthService
+    public class AdminAuthService(IUnitOfWork<AppDbContext> _uow, IConfiguration _configuration) : IAuthService
     {
         private readonly IGenericRepository<User> _userRepository = _uow.GetGenericRepository<User>();
 
         public async Task<ApiResponse<LoginDTO>> LoginAsync(UserLoginRequest request)
         {
-            var response = await _userRepository.GetAsync(x => x.Username.ToLower() == request.Username.ToLower());
+            var normalizedUsername = request.Username.Trim().ToLowerInvariant();
+            var response = await _userRepository.GetAsync(x => x.Username == normalizedUsername);
             var user = response?.FirstOrDefault();
 
-            if (user is null || user?.Role.ToString() != Role.Admin.ToString())
-            {
+            if (user is null || user?.Role != Role.Admin || !user.VerifyPassword(request.Password))
                 return new ApiResponse<LoginDTO>
                 {
-                    Message = AuthConstants.USER_NOT_FOUND,
-                    Success = false,
-                    NotificationType = NotificationType.BadRequest
+                    Message = AuthConstants.INVALID_CREDENTIAL,
+                    NotificationType = NotificationType.Unauthorized
                 };
-            }
-
-            if (!user.VerifyPassword(request.Password))
-                return new ApiResponse<LoginDTO>
-                {
-                    Message = AuthConstants.INVALID_PASSWORD,
-                    Success = false,
-                    NotificationType = NotificationType.NotFound
-                };
-
 
             var token = GenerateJwtToken(user);
 
             return new ApiResponse<LoginDTO>
             {
-                Success = true,
                 NotificationType = NotificationType.Success,
                 Message = AuthConstants.ADMIN_LOGIN_SUCCESS,
                 Data = new LoginDTO

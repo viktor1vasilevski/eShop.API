@@ -71,7 +71,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
 
         return new ApiResponse<List<SubcategoryDTO>>()
         {
-            Success = true,
             Data = subcategoriesDTO,
             NotificationType = NotificationType.Success,
             TotalCount = totalCount
@@ -80,20 +79,18 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
 
     public ApiResponse<SubcategoryDTO> CreateSubcategory(CreateSubcategoryRequest request)
     {
-        if (_subcategoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower()))
-            return new ApiResponse<SubcategoryDTO>()
-            {
-                Success = false,
-                Message = SubcategoryConstants.SUBCATEGORY_EXISTS,
-                NotificationType = NotificationType.Conflict
-            };
-
         if (!_categoryRepository.Exists(x => x.Id == request.CategoryId))
             return new ApiResponse<SubcategoryDTO>()
             {
-                Success = false,
                 Message = CategoryConstants.CATEGORY_DOESNT_EXIST,
                 NotificationType = NotificationType.NotFound,
+            };
+
+        if (_subcategoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower()))
+            return new ApiResponse<SubcategoryDTO>()
+            {
+                Message = SubcategoryConstants.SUBCATEGORY_EXISTS,
+                NotificationType = NotificationType.Conflict
             };
 
         try
@@ -104,7 +101,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
 
             return new ApiResponse<SubcategoryDTO>
             {
-                Success = true,
                 NotificationType = NotificationType.Created,
                 Message = SubcategoryConstants.SUBCATEGORY_SUCCESSFULLY_CREATED,
                 Data = new SubcategoryDTO
@@ -120,7 +116,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
         {
             return new ApiResponse<SubcategoryDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.BadRequest,
                 Message = ex.Message
             };
@@ -136,7 +131,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
 
             return new ApiResponse<SubcategoryDTO>
             {
-                Success = true,
                 NotificationType = NotificationType.Success,
                 Data = new SubcategoryDTO()
                 {
@@ -150,7 +144,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
 
         return new ApiResponse<SubcategoryDTO>
         {
-            Success = false,
             NotificationType = NotificationType.BadRequest,
             Message = SubcategoryConstants.SUBCATEGORY_DOESNT_EXIST,
         };
@@ -165,7 +158,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
         if (subcategory is null)
             return new ApiResponse<string>
             {
-                Success = false,
                 Message = SubcategoryConstants.SUBCATEGORY_DOESNT_EXIST,
                 NotificationType = NotificationType.NotFound
             };
@@ -173,7 +165,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
         if (HasRelatedEntities(subcategory))
             return new ApiResponse<string>
             {
-                Success = false,
                 Message = SubcategoryConstants.SUBCATEGORY_HAS_RELATED_ENTITIES,
                 NotificationType = NotificationType.Conflict
             };
@@ -183,7 +174,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
 
         return new ApiResponse<string>
         {
-            Success = true,
             Message = SubcategoryConstants.SUBCATEGORY_SUCCESSFULLY_DELETED,
             NotificationType = NotificationType.Success
         };
@@ -200,7 +190,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
         if (subcategory is null)
             return new ApiResponse<CategoryDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.NotFound,
                 Message = SubcategoryConstants.SUBCATEGORY_DOESNT_EXIST
             };
@@ -208,7 +197,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
         if (!_categoryRepository.Exists(x => x.Id == request.CategoryId))
             return new ApiResponse<CategoryDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.NotFound,
                 Message = CategoryConstants.CATEGORY_DOESNT_EXIST,
             };
@@ -216,7 +204,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
         if (_subcategoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower() && x.Id != id))
             return new ApiResponse<CategoryDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.Conflict,
                 Message = SubcategoryConstants.SUBCATEGORY_EXISTS
             };
@@ -229,7 +216,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
 
             return new ApiResponse<CategoryDTO>
             {
-                Success = true,
                 NotificationType = NotificationType.Success,
                 Message = SubcategoryConstants.SUBCATEGORY_SUCCESSFULLY_EDITED,
                 Data = new CategoryDTO { Id = id, Name = subcategory.Name }
@@ -239,7 +225,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
         {
             return new ApiResponse<CategoryDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.BadRequest,
                 Message = ex.Message
             };
@@ -269,7 +254,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
 
         return new ApiResponse<List<SelectSubcategoryListItemDTO>>
         {
-            Success = true,
             Data = subcategoriesDropdownDTO
         };
     }
@@ -286,7 +270,6 @@ public class SubcategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<Subcateg
 
         return new ApiResponse<List<SelectSubcategoryListItemDTO>>
         {
-            Success = true,
             Data = subcategoriesDropdownDTO
         };
     }

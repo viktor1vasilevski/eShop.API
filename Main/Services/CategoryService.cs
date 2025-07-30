@@ -66,7 +66,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
 
         return new ApiResponse<List<CategoryDTO>>()
         {
-            Success = true,
             Data = categoriesDTO,
             TotalCount = totalCount,
             NotificationType = NotificationType.Success,
@@ -78,7 +77,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         if (_categoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower()))
             return new ApiResponse<CategoryDTO>()
             {
-                Success = false,
                 Message = CategoryConstants.CATEGORY_EXISTS,
                 NotificationType = NotificationType.Conflict
             };
@@ -91,7 +89,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
 
             return new ApiResponse<CategoryDTO>
             {
-                Success = true,
                 NotificationType = NotificationType.Created,
                 Message = CategoryConstants.CATEGORY_SUCCESSFULLY_CREATED,
                 Data = new CategoryDTO { Id = category.Id, Name = category.Name, Created = category.Created }
@@ -101,7 +98,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         {
             return new ApiResponse<CategoryDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.BadRequest,
                 Message = ex.Message
             };
@@ -114,7 +110,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         if (category is null)
             return new ApiResponse<CategoryDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.NotFound,
                 Message = CategoryConstants.CATEGORY_DOESNT_EXIST
             };
@@ -122,7 +117,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         if (_categoryRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower() && x.Id != id))
             return new ApiResponse<CategoryDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.Conflict,
                 Message = CategoryConstants.CATEGORY_EXISTS
             };
@@ -135,7 +129,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
 
             return new ApiResponse<CategoryDTO>
             {
-                Success = true,
                 NotificationType = NotificationType.Success,
                 Message = CategoryConstants.CATEGORY_SUCCESSFULLY_UPDATE,
                 Data = new CategoryDTO { Id = id, Name = category.Name }
@@ -145,7 +138,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         {
             return new ApiResponse<CategoryDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.BadRequest,
                 Message = ex.Message
             };
@@ -159,14 +151,12 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         if (category is null)
             return new ApiResponse<CategoryDetailsDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.NotFound,
                 Message = CategoryConstants.CATEGORY_DOESNT_EXIST
             };
 
         return new ApiResponse<CategoryDetailsDTO>
         {
-            Success = true,
             NotificationType = NotificationType.Success,
             Data = new CategoryDetailsDTO { Id = category.Id, Name = category.Name }
         };
@@ -184,7 +174,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
 
         return new ApiResponse<List<SelectCategoryListItemDTO>>
         {
-            Success = true,
             Data = categoriesDropdownDTO
         };
     }
@@ -199,7 +188,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         if (category is null)
             return new ApiResponse<string>
             {
-                Success = false,
                 Message = CategoryConstants.CATEGORY_DOESNT_EXIST,
                 NotificationType = NotificationType.NotFound
             };
@@ -207,7 +195,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
         if (HasRelatedEntities(category))
             return new ApiResponse<string>
             {
-                Success = false,
                 Message = CategoryConstants.CATEGORY_HAS_RELATED_ENTITIES,
                 NotificationType = NotificationType.Conflict
             };
@@ -217,7 +204,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
 
         return new ApiResponse<string>
         {
-            Success = true,
             Message = CategoryConstants.CATEGORY_SUCCESSFULLY_DELETED,
             NotificationType = NotificationType.Success
         };
@@ -272,7 +258,6 @@ public class CategoryService(IUnitOfWork<AppDbContext> _uow, ILogger<CategorySer
 
         return new ApiResponse<List<CategoryWithSubcategoriesDTO>>
         {
-            Success = true,
             Data = categoriesDto
         };
     }

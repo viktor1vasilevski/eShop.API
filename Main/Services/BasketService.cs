@@ -25,7 +25,6 @@ public class BasketService(IUnitOfWork<AppDbContext> uow) : IBasketService
         {
             return new ApiResponse<string>
             {
-                Success = false,
                 Message = "User not found",
                 NotificationType = NotificationType.NotFound
             };
@@ -84,7 +83,6 @@ public class BasketService(IUnitOfWork<AppDbContext> uow) : IBasketService
 
         return new ApiResponse<string>
         {
-            Success = true,
             Message = "Basket successfully merged",
             NotificationType = NotificationType.Success
         };

@@ -31,7 +31,6 @@ public class UserService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryService
 
         return new ApiResponse<List<UserDTO>>
         {
-            Success = true,
             NotificationType = NotificationType.Success,
             Data = usersDTO
         };

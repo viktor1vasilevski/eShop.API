@@ -9,6 +9,7 @@
         Updated,
         NotFound,
         NoContent,
-        Conflict
+        Conflict,
+        Unauthorized
     }
 }

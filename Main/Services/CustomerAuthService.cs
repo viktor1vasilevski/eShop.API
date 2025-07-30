@@ -22,32 +22,22 @@ using System.Text;
 
 namespace eShop.Main.Services;
 
-public class CustomerAuthService(IUnitOfWork<AppDbContext> _uow, IConfiguration _configuration, ILogger<AuthService> _logger) : ICustomerAuthService
+public class CustomerAuthService(IUnitOfWork<AppDbContext> _uow, IConfiguration _configuration, ILogger<AdminAuthService> _logger) : ICustomerAuthService
 {
     private readonly IGenericRepository<User> _userRepository = _uow.GetGenericRepository<User>();
 
     public async Task<ApiResponse<LoginDTO>> LoginAsync(UserLoginRequest request)
     {
-        var response = await _userRepository.GetAsync(x => x.Username.ToLower() == request.Username.ToLower());
+        var normalizedUsername = request.Username.Trim().ToLowerInvariant();
+        var response = await _userRepository.GetAsync(x => x.Username == normalizedUsername);
         var user = response?.FirstOrDefault();
 
-        if (user is null || user?.Role.ToString() != Role.Customer.ToString())
+        if (user is null || user?.Role.ToString() != Role.Customer.ToString() || !user.VerifyPassword(request.Password))
         {
             return new ApiResponse<LoginDTO>
             {
-                Message = AuthConstants.USER_NOT_FOUND,
-                Success = false,
-                NotificationType = NotificationType.NotFound
-            };
-        }
-
-        if (!user.VerifyPassword(request.Password))
-        {
-            return new ApiResponse<LoginDTO>
-            {
-                Message = AuthConstants.INVALID_PASSWORD,
-                Success = false,
-                NotificationType = NotificationType.BadRequest
+                NotificationType = NotificationType.Unauthorized,
+                Message = AuthConstants.INVALID_CREDENTIAL,
             };
         }
 
@@ -55,7 +45,6 @@ public class CustomerAuthService(IUnitOfWork<AppDbContext> _uow, IConfiguration 
 
         return new ApiResponse<LoginDTO>
         {
-            Success = true,
             NotificationType = NotificationType.Success,
             Message = AuthConstants.CUSTOMER_LOGIN_SUCCESS,
             Data = new LoginDTO
@@ -71,14 +60,14 @@ public class CustomerAuthService(IUnitOfWork<AppDbContext> _uow, IConfiguration 
 
     public async Task<ApiResponse<RegisterDTO>> RegisterAsync(UserRegisterRequest request)
     {
-        var usersExist = await _userRepository.ExistsAsync(
-            filter: x => x.Username.ToLower() == request.Username.ToLower() || 
-                         x.Email.ToLower() == request.Email.ToLower());
+        var normalizedUsername = request.Username.Trim().ToLowerInvariant();
+        var normalizedEmail = request.Email.Trim().ToLowerInvariant();
+
+        var usersExist = await _userRepository.ExistsAsync(x => x.Username == normalizedUsername || x.Email == normalizedEmail);
 
         if (usersExist)
             return new ApiResponse<RegisterDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.Conflict,
                 Message = AuthConstants.ACCOUNT_ALREADY_EXISTS
             };
@@ -93,7 +82,6 @@ public class CustomerAuthService(IUnitOfWork<AppDbContext> _uow, IConfiguration 
 
             return new ApiResponse<RegisterDTO>
             {
-                Success = true,
                 NotificationType = NotificationType.Success,
                 Message = AuthConstants.CUSTOMER_REGISTER_SUCCESS,
                 Data = new RegisterDTO
@@ -110,7 +98,6 @@ public class CustomerAuthService(IUnitOfWork<AppDbContext> _uow, IConfiguration 
         {
             return new ApiResponse<RegisterDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.BadRequest,
                 Message = ex.Message
             };

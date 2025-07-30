@@ -44,8 +44,8 @@ public class User : AuditableBaseEntity
         {
             FirstName = firstName,
             LastName = lastName,
-            Username = username,
-            Email = email,
+            Username = username.ToLower(),
+            Email = email.ToLower(),
             PasswordHash = hash,
             SaltKey = Convert.ToBase64String(salt),
             Role = role

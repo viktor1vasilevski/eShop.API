@@ -12,7 +12,7 @@ public static class AuthConstants
 
     // Validation Errors
     public const string USER_NOT_FOUND = "User not found.";
-    public const string INVALID_PASSWORD = "The password you entered is incorrect.";
+    public const string INVALID_CREDENTIAL = "Invalid email or password.";
     public const string ACCOUNT_ALREADY_EXISTS = "An account with the provided credentials already exists.";
 
 }

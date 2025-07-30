@@ -18,6 +18,7 @@ public abstract class BaseController : ControllerBase
             NotificationType.NoContent => NoContent(),
             NotificationType.ServerError => StatusCode(500, response),
             NotificationType.Conflict => StatusCode(409, response),
+            NotificationType.Unauthorized => Unauthorized(response),
             _ => Ok(response),
         };
     }

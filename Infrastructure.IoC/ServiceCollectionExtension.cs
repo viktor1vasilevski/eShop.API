@@ -10,7 +10,7 @@ public static class ServiceCollectionExtension
     public static IServiceCollection AddIoCService(this IServiceCollection services)
     {
 
-        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAuthService, AdminAuthService>();
         services.AddScoped<ICustomerAuthService, CustomerAuthService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<ISubcategoryService, SubcategoryService>();

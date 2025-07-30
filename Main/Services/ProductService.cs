@@ -82,7 +82,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
 
         return new ApiResponse<List<ProductDTO>>()
         {
-            Success = true,
             Data = productsDTO,
             TotalCount = totalCount,
             NotificationType = NotificationType.Success
@@ -94,7 +93,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
         if (!_subcategoryRepository.Exists(x => x.Id == request.SubcategoryId))
             return new ApiResponse<ProductDTO>
             {
-                Success = false,
                 Message = SubcategoryConstants.SUBCATEGORY_DOESNT_EXIST,
                 NotificationType = NotificationType.NotFound
             };
@@ -115,7 +113,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
 
             return new ApiResponse<ProductDTO>
             {
-                Success = true,
                 Message = ProductConstants.PRODUCT_SUCCESSFULLY_CREATED,
                 NotificationType = NotificationType.Created,
                 Data = new ProductDTO
@@ -134,7 +131,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
         {
             return new ApiResponse<ProductDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.BadRequest,
                 Message = ex.Message
             };
@@ -147,7 +143,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
         if (product is null)
             return new ApiResponse<string>
             {
-                Success = false,
                 NotificationType = NotificationType.NotFound,
                 Message = ProductConstants.PRODUCT_DOESNT_EXIST
             };
@@ -157,7 +152,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
 
         return new ApiResponse<string>
         {
-            Success = true,
             Message = ProductConstants.PRODUCT_SUCCESSFULLY_DELETED,
             NotificationType = NotificationType.Success
         };
@@ -172,7 +166,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
         if (product is null)
             return new ApiResponse<ProductDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.NotFound,
                 Message = ProductConstants.PRODUCT_DOESNT_EXIST
             };
@@ -195,7 +188,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
 
         return new ApiResponse<ProductDTO>
         {
-            Success = true,
             NotificationType = NotificationType.Success,
             Data = productDto
         };
@@ -207,7 +199,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
         if (product is null)
             return new ApiResponse<ProductDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.NotFound,
                 Message = ProductConstants.PRODUCT_DOESNT_EXIST
             };
@@ -215,7 +206,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
         if (_productRepository.Exists(x => x.Name.ToLower() == request.Name.ToLower() && x.Id != id))
             return new ApiResponse<ProductDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.Conflict,
                 Message = ProductConstants.PRODUCT_EXISTS
             };
@@ -223,7 +213,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
         if (!_subcategoryRepository.Exists(x => x.Id == request.SubcategoryId))
             return new ApiResponse<ProductDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.NotFound,
                 Message = SubcategoryConstants.SUBCATEGORY_DOESNT_EXIST,
             };
@@ -244,7 +233,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
 
             return new ApiResponse<ProductDTO>
             {
-                Success = true,
                 NotificationType = NotificationType.Success,
                 Message = ProductConstants.PRODUCT_SUCCESSFULLY_UPDATED,
                 //Data = new CategoryDTO { Id = id, Name = request.Name }
@@ -254,7 +242,6 @@ public class ProductService(IUnitOfWork<AppDbContext> _uow, ILogger<CategoryServ
         {
             return new ApiResponse<ProductDTO>
             {
-                Success = false,
                 NotificationType = NotificationType.BadRequest,
                 Message = ex.Message
             };
