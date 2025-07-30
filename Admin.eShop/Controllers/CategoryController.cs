@@ -5,9 +5,8 @@ namespace eShop.Admin.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-public class CategoryController(ICategoryService categoryService) : BaseController
+public class CategoryController(ICategoryService _categoryService) : BaseController
 {
-    private readonly ICategoryService _categoryService = categoryService;
 
     [HttpGet]
     public IActionResult Get([FromQuery] CategoryRequest request)

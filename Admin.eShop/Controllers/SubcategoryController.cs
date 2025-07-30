@@ -5,9 +5,8 @@ namespace eShop.Admin.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-public class SubcategoryController(ISubcategoryService subcategoryService) : BaseController
+public class SubcategoryController(ISubcategoryService _subcategoryService) : BaseController
 {
-    private readonly ISubcategoryService _subcategoryService = subcategoryService;
 
 
     [HttpGet]

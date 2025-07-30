@@ -5,9 +5,8 @@ namespace eShop.Admin.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-public class ProductController(IProductService productService) : BaseController
+public class ProductController(IProductService _productService) : BaseController
 {
-    private readonly IProductService _productService = productService;
 
     [HttpGet]
     public IActionResult Get([FromQuery] ProductRequest request)
