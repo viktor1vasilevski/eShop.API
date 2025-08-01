@@ -1,4 +1,5 @@
 ﻿using eShop.Main.Interfaces;
+using eShop.Main.Requests.Basket;
 using eShop.Main.Requests.Cart;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,5 +23,13 @@ namespace eShop.PublicApi.Controllers
             var response = await _basketService.Merge(userId, request);
             return HandleResponse(response);
         }
+
+        [HttpPatch("{userId}/items/{productId}")]
+        public async Task<IActionResult> UpdateItemQuantity(Guid userId, Guid productId, [FromBody] UpdateQuantityRequest request)
+        {
+            var response = await _basketService.UpdateItemQuantityAsync(userId, productId, request.Quantity);
+            return HandleResponse(response);
+        }
+
     }
 }

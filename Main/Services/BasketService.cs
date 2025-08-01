@@ -71,9 +71,6 @@ public class BasketService(IUnitOfWork<AppDbContext> uow) : IBasketService
         };
     }
 
-
-
-
     public async Task<ApiResponse<string>> Merge(Guid userId, List<BasketRequest> request)
     {
         var userExists = await _userRepository.ExistsAsync(x => x.Id == userId);
@@ -140,6 +137,81 @@ public class BasketService(IUnitOfWork<AppDbContext> uow) : IBasketService
             Message = "Basket successfully merged",
             NotificationType = NotificationType.Success
         };
+    }
+
+    public async Task<ApiResponse<BasketDTO>> UpdateItemQuantityAsync(Guid userId, Guid productId, int newQuantity)
+    {
+        // Load the basket with items and products
+        var baskets = await _basketRepository.GetAsync(
+            filter: b => b.UserId == userId,
+            include: b => b.Include(x => x.Items).ThenInclude(i => i.Product)
+        );
+
+        var basket = baskets.FirstOrDefault();
+        if (basket == null)
+        {
+            return new ApiResponse<BasketDTO>
+            {
+                NotificationType = NotificationType.NotFound,
+                Message = "Basket not found."
+            };
+        }
+
+        var item = basket.Items.FirstOrDefault(i => i.ProductId == productId);
+        if (item == null)
+        {
+            return new ApiResponse<BasketDTO>
+            {
+                NotificationType = NotificationType.NotFound,
+                Message = "Item not found in basket."
+            };
+        }
+
+        // Validate quantity bounds
+        int validQuantity = Math.Max(1, Math.Min(newQuantity, item.Product?.UnitQuantity ?? int.MaxValue));
+
+        item.Quantity = validQuantity;
+
+        // Update the basket item directly
+        await _basketItemRepository.UpdateAsync(item);
+
+        // Save changes once
+        await uow.SaveChangesAsync();
+
+        // Prepare DTO for response
+        var basketDto = new BasketDTO
+        {
+            Items = basket.Items.Select(i => new BasketItemDTO
+            {
+                ProductId = i.ProductId,
+                ProductName = i.Product?.Name,
+                Quantity = i.Quantity,
+                Price = i.Product?.UnitPrice ?? 0,
+                UnitQuantity = i.Product?.UnitQuantity ?? 0,
+                ImageDataUrl = BuildImageDataUrl(i.Product?.Image, i.Product?.ImageType)
+            }).ToList()
+        };
+
+        return new ApiResponse<BasketDTO>
+        {
+            NotificationType = NotificationType.Success,
+            Message = "Item quantity updated.",
+            Data = basketDto
+        };
+    }
+
+
+    // You can reuse your existing BuildImageDataUrl method or make it private
+    private string? BuildImageDataUrl(byte[]? bytes, string? imageType)
+    {
+        if (bytes == null || bytes.Length == 0 || string.IsNullOrWhiteSpace(imageType))
+            return null;
+
+        var lower = imageType.Trim().ToLowerInvariant();
+        string mime = lower.StartsWith("image/") ? lower : $"image/{lower}";
+
+        var base64 = Convert.ToBase64String(bytes);
+        return $"data:{mime};base64,{base64}";
     }
 
 }

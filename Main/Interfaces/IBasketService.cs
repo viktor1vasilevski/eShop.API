@@ -8,4 +8,6 @@ public interface IBasketService
 {
     Task<ApiResponse<string>> Merge(Guid userId, List<BasketRequest> request);
     Task<ApiResponse<BasketDTO>> GetBasketByUserIdAsync(Guid userId);
+    Task<ApiResponse<BasketDTO>> UpdateItemQuantityAsync(Guid userId, Guid productId, int newQuantity);
+
 }
