@@ -1,17 +1,20 @@
 ﻿using eShop.Main.Interfaces;
 using eShop.Main.Requests.Cart;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eShop.PublicApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Customer")]
     public class BasketController(IBasketService _basketService) : BaseController
     {
 
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetBasketByUserId([FromRoute] Guid userId)
+        {
+            var response = await _basketService.GetBasketByUserIdAsync(userId);
+            return HandleResponse(response);
+        }
 
         [HttpPost("Merge/{userId}")]
         public async Task<IActionResult> Merge([FromRoute] Guid userId, [FromBody] List<BasketRequest> request)

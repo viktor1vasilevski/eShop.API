@@ -3,6 +3,7 @@ using Domain.Models;
 using eShop.Domain.Interfaces;
 using eShop.Domain.Models;
 using eShop.Infrastructure.Data.Context;
+using eShop.Main.DTOs.Basket;
 using eShop.Main.Interfaces;
 using eShop.Main.Requests.Cart;
 using eShop.Main.Responses;
@@ -18,20 +19,73 @@ public class BasketService(IUnitOfWork<AppDbContext> uow) : IBasketService
     private readonly IGenericRepository<User> _userRepository = uow.GetGenericRepository<User>();
     private readonly IGenericRepository<BasketItem> _basketItemRepository = uow.GetGenericRepository<BasketItem>();
 
+    public async Task<ApiResponse<BasketDTO>> GetBasketByUserIdAsync(Guid userId)
+    {
+        var baskets = await _basketRepository.GetAsync(
+            filter: b => b.UserId == userId,
+            include: b => b.Include(x => x.Items).ThenInclude(i => i.Product)
+        );
+
+        var basket = baskets.FirstOrDefault();
+
+        if (basket is null)
+        {
+            return new ApiResponse<BasketDTO>
+            {
+                NotificationType = NotificationType.NotFound,
+                Message = "No basket found for the user."
+            };
+        }
+
+        string? BuildImageDataUrl(byte[]? bytes, string? imageType)
+        {
+            if (bytes == null || bytes.Length == 0 || string.IsNullOrWhiteSpace(imageType))
+                return null;
+
+            // Normalize mime type (e.g., "jpeg" -> "image/jpeg")
+            var lower = imageType.Trim().ToLowerInvariant();
+            string mime = lower.StartsWith("image/") ? lower : $"image/{lower}";
+
+            var base64 = Convert.ToBase64String(bytes);
+            return $"data:{mime};base64,{base64}";
+        }
+
+        var basketDto = new BasketDTO
+        {
+            Items = basket.Items.Select(i => new BasketItemDTO
+            {
+                ProductId = i.ProductId,
+                ProductName = i.Product?.Name,
+                Quantity = i.Quantity,
+                Price = i.Product?.UnitPrice ?? 0,
+                UnitQuantity = i.Product?.UnitQuantity ?? 0,
+                ImageDataUrl = BuildImageDataUrl(i.Product?.Image, i.Product?.ImageType)
+            }).ToList()
+        };
+
+        return new ApiResponse<BasketDTO>
+        {
+            NotificationType = NotificationType.Success,
+            Message = "Basket retrieved successfully.",
+            Data = basketDto
+        };
+    }
+
+
+
+
     public async Task<ApiResponse<string>> Merge(Guid userId, List<BasketRequest> request)
     {
         var userExists = await _userRepository.ExistsAsync(x => x.Id == userId);
         if (!userExists)
-        {
             return new ApiResponse<string>
             {
                 Message = "User not found",
                 NotificationType = NotificationType.NotFound
             };
-        }
 
         var basket = _basketRepository
-            .Get(x => x.UserId == userId, include: x => x.Include(b => b.Items))
+            .Get(x => x.UserId == userId, include: x => x.Include(b => b.Items).ThenInclude(x => x.Product))
             .FirstOrDefault();
 
         if (basket is null)
@@ -70,7 +124,7 @@ public class BasketService(IUnitOfWork<AppDbContext> uow) : IBasketService
             if (existingItem != null)
             {
                 existingItem.Quantity = finalQuantity;
-                _basketItemRepository.Update(existingItem);
+                await _basketItemRepository.UpdateAsync(existingItem);
             }
             else
             {
